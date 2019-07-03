@@ -66,7 +66,7 @@ class CyclicLR(Callback):
     def __init__(
             self,
             base_lr=0.001,
-            max_lr=0.006,
+            max_lr=0.008,
             step_size=2000.,
             mode='triangular',
             gamma=1.,

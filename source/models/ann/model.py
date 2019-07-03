@@ -7,20 +7,18 @@ from keras.models import Model
 from source.base_dl_model import BaseDLModel
 from source.models.dense_layers.dense_layers import create_dense_network
 
-
 kernel_init = keras.initializers.glorot_uniform()
 bias_init = keras.initializers.Constant(value=0.2)
 
 
 class ANN(BaseDLModel):
-    num_of_neurons = [1000, 600, 200, 400, 600]
+    num_of_neurons = [800, 600, 400, 200]
 
     def __init__(self,
                  **parameters: Any) -> None:
         super(ANN, self).__init__(**parameters)
 
     def build_model(self) -> None:
-
         inputs = [Input(input_shape) for input_shape in self.rnn_shapes.values()]
         layers = [Flatten()(input) for input in inputs]
         layers = [Dropout(0.25)(layer) for layer in layers]
