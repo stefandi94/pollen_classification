@@ -121,3 +121,14 @@ def create_generator() -> "ImageDataGenerator":
 def normalize(X: np.ndarray) -> np.ndarray:
     X = keras.utils.normalize(X, axis=-1)
     return X
+
+
+def count_values(array):
+    """
+    Given array return dictionary with class numbers and number of instances of that class
+    :param array:
+    :return:
+    """
+    unique, counts = np.unique(array, return_counts=True)
+    return dict(zip(unique, counts))
+

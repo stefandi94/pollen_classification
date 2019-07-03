@@ -6,7 +6,7 @@ import keras
 from settings import MODEL_DIR
 from source.data_reader import load_all_data
 from source.models import BiLSTM
-from source.utilites import calculate_weights, smooth_labels
+from utils.utilites import calculate_weights, smooth_labels
 
 smooth_factor = 0.03
 learning_rate = 0.01

@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from settings import NUM_OF_CLASSES
+from utils.utilites import count_values
+
 
 def show_values(pc, fmt="%.2f", **kw):
     """
@@ -132,21 +135,40 @@ def plot_pred(report):
 
 def plot_confidence(y_true, y_pred):
     true_conf = []
-    true_pred = []
-    false_pred = []
     false_conf = []
     for idx, (pred, conf) in enumerate(y_pred):
         if pred == y_true[idx]:
-            true_pred.append(pred)
             true_conf.append(conf)
         else:
-            false_pred.append(pred)
             false_conf.append(conf)
     bins = np.arange(0, 1, 0.05)
-    hist_1, _ = np.histogram(true_conf, bins)
-    hist_2, _ = np.histogram(false_conf, bins)
+    false_pred, _ = np.histogram(false_conf, bins)
+    true_pred, _ = np.histogram(true_conf, bins)
 
+    legend = ['misses', 'hits']
     ax = plt.subplot(111)
-    ax.bar(bins[1:] + 0.03, hist_1, width=0.015, color='b', align='center')
-    ax.bar(bins[1:] - 0.03, hist_2, width=0.015, color='r', align='center')
+    ax.bar(bins[1:] + 0.0325, false_pred, width=0.015, color='b', align='center')
+    ax.bar(bins[1:] - 0.0325, true_pred, width=0.015, color='r', align='center')
+    plt.legend(legend, loc='best')
+    plt.savefig('./conf.png')
+    plt.show()
+
+
+def plot_classes(y_true, y_pred):
+
+    class_pred = [clas[0] for clas in y_pred]
+    pred_dict = count_values(class_pred)
+    true_dict = count_values(y_true)
+
+    for i in range(NUM_OF_CLASSES):
+        if i not in pred_dict.keys():
+            pred_dict[i] = 0
+
+    legend = ['predicted', 'true']
+    plt.figure(figsize=(15, 10))
+    plt.bar(np.arange(-0.2, NUM_OF_CLASSES - 1, 1), list(pred_dict.values()), width=0.3, align='center', color='r')
+    plt.bar(np.arange(0.2, NUM_OF_CLASSES, 1), list(true_dict.values()), width=0.3, align='center', color='b')
+    plt.xticks(range(len(true_dict)), list(true_dict.keys()))
+    plt.legend(legend, loc='best')
+    plt.savefig('./classes.png')
     plt.show()

@@ -12,7 +12,7 @@ from keras.metrics import top_k_categorical_accuracy
 from keras_self_attention import SeqSelfAttention
 
 from settings import NUM_OF_CLASSES
-from source.utilites import multiple_generator
+from utils.utilites import multiple_generator
 
 
 class BaseDLModel:
@@ -122,8 +122,8 @@ class BaseDLModel:
                            verbose=1,
                            epochs=self.epochs,
                            batch_size=self.batch_size,
-                           callbacks=callbacks_list,
-                           class_weight=[weight_class, weight_class, weight_class])
+                           callbacks=callbacks_list)
+                           # class_weight=[weight_class, weight_class, weight_class])
 
         else:
             self.model.fit_generator(multiple_generator(X_train, y_train, batch_size=self.batch_size),
