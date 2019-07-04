@@ -3,7 +3,7 @@ from keras.optimizers import Adam, SGD, Nadam
 
 from settings import NUM_OF_CLASSES
 from source.data_reader import load_all_data
-from source.models import BiLSTM, CNN
+from source.models import BiLSTM, CNN, RNNLSTM
 from source.models.ann_cnn_rnn import ANNCNNRNN
 from source.plotting_predictions import plot_confidence
 from utils.utilites import calculate_weights, smooth_labels
@@ -30,9 +30,10 @@ if __name__ == '__main__':
 
     smooth_labels(y_train_cate, smooth_factor)
 
-    dnn = ANNCNNRNN(**parameters)
+    dnn = RNNLSTM(**parameters)
     dnn.rnn_shapes = rnn_shapes
     # dnn.load_model(parameters["load_dir"])
     dnn.train(X_train[:3], y_train_cate, X_valid[:3], y_valid_cate, weight_class)
     # y_pred = dnn.predict(X_valid)
     # plot_confidence(y_valid, y_pred)
+    # plot_classes(y_valid, y_pred)

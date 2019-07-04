@@ -17,7 +17,7 @@ class RNNLSTM(BaseDLModel):
     def build_model(self) -> None:
         inputs = [Input(input_shape) for input_shape in self.rnn_shapes.values()]
         layers = [Flatten()(layer) for layer in inputs]
-        layers = [create_dense_network(layer, num_of_neurons=[100, 50]) for layer in layers]
+        layers = [create_dense_network(layer, num_of_neurons=[50]) for layer in layers]
         layers = [Reshape((int(layer.shape[1]), 1))(layer) for layer in layers]
 
         lstms = [LSTM(128, return_sequences=False, recurrent_dropout=0.25, dropout=0.25)(layer) for layer in layers]
@@ -26,12 +26,11 @@ class RNNLSTM(BaseDLModel):
         # lstm = Masking(0.25)(lstm)
         # lstm = LSTM(128, return_sequences=False, recurrent_dropout=0.25, dropout=0.25)(lstm)
         # attention = SeqSelfAttention(attention_activation='sigmoid')(lstm)
-        # attention = SeqSelfAttention(attention_activation='sigmoid')(lstm)
         # attention = Flatten()(layers)
         attention = Dropout(0.5)(layers)
         # attention = BatchNormalization()(attention)
         # attention = LeakyReLU()(attention)
-        #
+
         # attention = Dense(50)(attention)
         # attention = Dropout(0.5)(attention)
         output = Dense(self.num_classes, activation="softmax")(attention)

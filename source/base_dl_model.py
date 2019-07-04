@@ -105,12 +105,12 @@ class BaseDLModel:
         with open(osp.join(self.save_dir, 'model_summary.txt'), 'w') as f:
             with redirect_stdout(f):
                 self.model.summary()
-
+        clr = CyclicLR()
         checkpoint = ModelCheckpoint(os.path.join(self.save_dir, weights_name),
                                      monitor='val_acc',
                                      verbose=1,
                                      save_weights_only=False,
-                                     save_best_only=False,
+                                     save_best_only=True,
                                      mode='max')
 
         clr = CyclicLR(max_lr=0.008, mode='exp_range')
@@ -124,7 +124,6 @@ class BaseDLModel:
                            epochs=self.epochs,
                            batch_size=self.batch_size,
                            callbacks=callbacks_list)
-                           # class_weight=[weight_class, weight_class, weight_class])
 
         else:
             self.model.fit_generator(multiple_generator(X_train, y_train, batch_size=self.batch_size),
