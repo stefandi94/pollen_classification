@@ -12,6 +12,7 @@ from keras.metrics import top_k_categorical_accuracy
 from keras_self_attention import SeqSelfAttention
 
 from settings import NUM_OF_CLASSES
+from source.learning_rates.cyclical_lr import CyclicLR
 from utils.utilites import multiple_generator
 
 
@@ -98,8 +99,7 @@ class BaseDLModel:
                            optimizer=self.optimizer(self.learning_rate),
                            metrics=['accuracy', top_k_categorical_accuracy, self.precision, self.recall, self.f1])
 
-        weights_name = "{epoch}-{loss:.3f}-{acc:.3f}-" \
-                       "{val_loss:.3f}-{val_acc:.3f}.hdf5"
+        weights_name = "{epoch}-{loss:.3f}-{acc:.3f}-{val_loss:.3f}-{val_acc:.3f}.hdf5"
 
         # print(self.model.summary())
         with open(osp.join(self.save_dir, 'model_summary.txt'), 'w') as f:
@@ -113,8 +113,9 @@ class BaseDLModel:
                                      save_best_only=False,
                                      mode='max')
 
+        clr = CyclicLR(max_lr=0.008, mode='exp_range')
         csv_logger = CSVLogger(osp.join(self.save_dir, "model_history_log.csv"), append=True)
-        callbacks_list = [checkpoint, csv_logger]
+        callbacks_list = [checkpoint, csv_logger, clr]
 
         if not generator:
             self.model.fit(X_train, y_train,
