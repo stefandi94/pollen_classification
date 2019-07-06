@@ -1,15 +1,13 @@
 import keras
-from keras.optimizers import Adam, SGD, Nadam
+from keras.optimizers import Adam
 
 from settings import NUM_OF_CLASSES
 from source.data_reader import load_all_data
-from source.models import BiLSTM, CNN, RNNLSTM, CNNRNN, ResidualNet
-from source.models.ann_cnn_rnn import ANNCNNRNN
-from source.plotting_predictions import plot_confidence
+from source.models import ResidualNet, ANNCNN
 from utils.utilites import calculate_weights, smooth_labels
 
-parameters = dict(epochs=300, batch_size=64, optimizer=Adam, learning_rate=0.007, num_layer=18,
-                  save_dir='./model_weights/new/res_net/0.005')
+parameters = dict(epochs=300, batch_size=32, optimizer=Adam, learning_rate=0.007,
+                  save_dir='./model_weights/ann_cnn')
                   # load_dir='./model_weights/new/c/0.005/25-1.931-0.465-1.677-0.510.hdf5')
 
 smooth_factor = 0.1
@@ -30,7 +28,7 @@ if __name__ == '__main__':
 
     smooth_labels(y_train_cate, smooth_factor)
 
-    dnn = ResidualNet(**parameters)
+    dnn = ANNCNN(**parameters)
     dnn.rnn_shapes = rnn_shapes
     # dnn.load_model(parameters["load_dir"])
     dnn.train(X_train[:3], y_train_cate, X_valid[:3], y_valid_cate, weight_class)
