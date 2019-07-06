@@ -15,9 +15,6 @@ class ResidualNet(BaseDLModel):
                  **parameters: Any) -> None:
         super().__init__(**parameters)
 
-        if num_layer not in self.num_to_model.keys():
-            raise Exception('Model number should be 18, 34, 59, 101 or 152, try again!')
-
         self.num_layer = num_layer
         self.num_to_model = {18: self.resnet18,
                              34: self.resnet34,
@@ -25,12 +22,15 @@ class ResidualNet(BaseDLModel):
                              101: self.resnet101,
                              152: self.resnet152}
 
+        if num_layer not in self.num_to_model.keys():
+            raise Exception('Model number should be 18, 34, 59, 101 or 152, try again!')
+
     def build_model(self) -> None:
         self.num_to_model[self.num_layer]()
 
     def _resnet(self,
-                convx: List[int] = [128, 256],
-                n_convx: List[int] = [2, 2]) -> None:
+                convx: List[int] = [32, 64, 128, 256],
+                n_convx: List[int] = [1, 1, 1, 1]) -> None:
         """
         :param convx:
         :param n_convx:

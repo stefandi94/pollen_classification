@@ -15,7 +15,7 @@ RUN apt-get update && \
     mkdir /install
 #RUN cd /home/stefan/PycharmProjects/aaaa/
 #COPY requirements.txt /tmp
-#COPY parser.py /tmp
+#COPY main.py /tmp
 #COPY settings.py /tmp
 #COPY source /tmp
 #COPY utils /tmp

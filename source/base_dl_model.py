@@ -105,7 +105,6 @@ class BaseDLModel:
         with open(osp.join(self.save_dir, 'model_summary.txt'), 'w') as f:
             with redirect_stdout(f):
                 self.model.summary()
-        clr = CyclicLR()
         checkpoint = ModelCheckpoint(os.path.join(self.save_dir, weights_name),
                                      monitor='val_acc',
                                      verbose=1,

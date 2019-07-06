@@ -29,12 +29,11 @@ class CNNRNN(BaseDLModel):
         layer_1 = LSTM(128, return_sequences=False, recurrent_dropout=0.2, kernel_regularizer=l1_l2(KERNEL_REGULARIZER),
                        bias_regularizer=l1_l2(BIAS_REGULARIZER), activity_regularizer=l1_l2(ACTIVITY_REGULARIZER))(layer_1)
 
-        inputs_2 = [Input(input_shape) for input_shape in self.cnn_shapes.values()]
-        layers_2 = [create_cnn_network(layer, self.convolution_filters) for layer in inputs_2]
+        layers_2 = [create_cnn_network(layer, self.convolution_filters) for layer in inputs_1]
         layer_2 = concatenate([layer for layer in layers_2])
 
         layer = concatenate([layer_1, layer_2])
         flatten = Dropout(0.5)(layer)
         output = Dense(self.num_classes, activation='softmax')(flatten)
-        model = Model([inputs_2[0], inputs_2[1], inputs_1[0], inputs_1[1]], output)
+        model = Model(inputs_1, output)
         self.model = model
