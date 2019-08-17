@@ -103,9 +103,10 @@ def plot_classification_report(classification_report, title='Classification repo
     plotMat = []
     support = []
     class_names = []
-    for line in lines[2 : (len(lines) - 2)]:
+    for line in lines[2: (len(lines) - 3)]:
         t = line.strip().split()
-        if len(t) < 2: continue
+        if len(t) < 2:
+            continue
         classes.append(t[0])
         v = [float(x) for x in t[1: len(t) - 1]]
         support.append(int(t[-1]))
@@ -119,7 +120,7 @@ def plot_classification_report(classification_report, title='Classification repo
     xlabel = 'Metrics'
     ylabel = 'Classes'
     xticklabels = ['Precision', 'Recall', 'F1-score']
-    yticklabels = ['{0} ({1})'.format(class_names[idx], sup) for idx, sup  in enumerate(support)]
+    yticklabels = ['{0} ({1})'.format(class_names[idx], sup) for idx, sup in enumerate(support)]
     figure_width = 25
     figure_height = len(class_names) + 7
     correct_orientation = False
@@ -136,11 +137,18 @@ def plot_pred(report):
 def plot_confidence(y_true, y_pred):
     true_conf = []
     false_conf = []
+    true_dicti = dict((k, []) for k in range(50))
+    false_dicti = dict((k, []) for k in range(50))
+
     for idx, (pred, conf) in enumerate(y_pred):
         if pred == y_true[idx]:
             true_conf.append(conf)
+            true_dicti[pred].append(conf)
         else:
             false_conf.append(conf)
+            false_dicti[pred].append(conf)
+
+    print(f'Confidence for true prediction is {np.mean(y_true)}, and for false prediction is {np.mean(y_pred)}')
     bins = np.arange(0, 1, 0.05)
     false_pred, _ = np.histogram(false_conf, bins)
     true_pred, _ = np.histogram(true_conf, bins)
@@ -152,6 +160,8 @@ def plot_confidence(y_true, y_pred):
     plt.legend(legend, loc='best')
     plt.savefig('./conf.png')
     plt.show()
+
+    return true_dicti, false_dicti
 
 
 def plot_classes(y_true, y_pred):
@@ -171,4 +181,19 @@ def plot_classes(y_true, y_pred):
     plt.xticks(range(len(true_dict)), list(true_dict.keys()))
     plt.legend(legend, loc='best')
     plt.savefig('./classes.png')
+    plt.show()
+
+
+def plot_confidence_per_class(true_conf_dict, false_conf_dict, num_class):
+    bins = np.arange(0, 1, 0.05)
+    true_classes_conf, _ = np.histogram(true_conf_dict[num_class], bins)
+    false_conf_dict, _ = np.histogram(false_conf_dict[num_class], bins)
+
+    legend = ['predicted', 'true']
+    plt.figure(figsize=(15, 10))
+    ax = plt.subplot(111)
+    ax.bar(bins[1:] + 0.0325, true_classes_conf, width=0.015, color='b', align='center')
+    ax.bar(bins[1:] - 0.0325, false_conf_dict, width=0.015, color='r', align='center')
+    plt.legend(legend, loc='best')
+    plt.savefig(f'./conf_class_{num_class}.png')
     plt.show()

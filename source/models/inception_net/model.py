@@ -29,9 +29,4 @@ class Inception(BaseDLModel):
         aux_output_1 = Dense(self.num_classes, activation='softmax')(aux_output_1)
 
         model = Model(inputs, [output, aux_output_2, aux_output_1])
-        model.compile(loss=['categorical_crossentropy',
-                            'categorical_crossentropy',
-                            'categorical_crossentropy'],
-                      loss_weights=[1, 0.6, 0.4],
-                      optimizer=Adam(), metrics=['accuracy'])
         self.model = model

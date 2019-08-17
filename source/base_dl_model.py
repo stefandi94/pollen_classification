@@ -9,6 +9,7 @@ import numpy as np
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, CSVLogger
 from keras.metrics import top_k_categorical_accuracy
+from keras.utils import plot_model
 from keras_self_attention import SeqSelfAttention
 
 from settings import NUM_OF_CLASSES
@@ -50,7 +51,7 @@ class BaseDLModel:
         self.load_dir = None
 
         self.optimizer = None
-        self.learning_rate = None
+        self.learning_rate = 0.001
 
         for k in kwargs.keys():
             if k not in allowed_kwargs:
@@ -95,24 +96,33 @@ class BaseDLModel:
             self.load_model(self.load_dir)
             print(f'Model is loaded from {self.load_dir}')
 
-        self.model.compile(loss='categorical_crossentropy',
+        # self.model.compile(loss='categorical_crossentropy',
+        #                    optimizer=self.optimizer(self.learning_rate),
+        #                    metrics=['accuracy', top_k_categorical_accuracy, self.precision, self.recall, self.f1])
+        self.model.compile(loss=['categorical_crossentropy',
+                                 'categorical_crossentropy',
+                                 'categorical_crossentropy'],
+                           loss_weights=[1, 0.6, 0.4],
                            optimizer=self.optimizer(self.learning_rate),
                            metrics=['accuracy', top_k_categorical_accuracy, self.precision, self.recall, self.f1])
 
-        weights_name = "{epoch}-{loss:.3f}-{acc:.3f}-{val_loss:.3f}-{val_acc:.3f}.hdf5"
+                           # weights_name = "{epoch}-{loss:.3f}-{acc:.3f}-{val_loss:.3f}-{val_acc:.3f}.hdf5"
+        weights_name = "{epoch}-{dense_1_loss:.3f}-{dense_1_acc:.3f}-{val_dense_1_loss:.3f}-{val_dense_1_acc:.3f}.hdf5"
 
         # print(self.model.summary())
         with open(osp.join(self.save_dir, 'model_summary.txt'), 'w') as f:
             with redirect_stdout(f):
                 self.model.summary()
+        plot_model(self.model, to_file=osp.join(self.save_dir, 'model.png'), show_shapes=True, show_layer_names=True)
+
         checkpoint = ModelCheckpoint(os.path.join(self.save_dir, weights_name),
                                      monitor='val_acc',
                                      verbose=1,
                                      save_weights_only=False,
-                                     save_best_only=True,
+                                     save_best_only=False,
                                      mode='max')
 
-        clr = CyclicLR(max_lr=0.008, mode='exp_range')
+        clr = CyclicLR(base_lr=0.002, max_lr=0.01, mode='exp_range')
         csv_logger = CSVLogger(osp.join(self.save_dir, "model_history_log.csv"), append=True)
         callbacks_list = [checkpoint, csv_logger, clr]
 
