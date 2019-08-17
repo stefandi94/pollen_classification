@@ -25,7 +25,8 @@ class BiLSTM(BaseDLModel):
         layers = [create_dense_network(layer, num_of_neurons=self.num_of_neurons[2]) for layer in layers]
         layers = [Reshape((int(layer.shape[1]), 1))(layer) for layer in layers]
 
-        lstms = [Bidirectional(LSTM(128, return_sequences=False, recurrent_dropout=0.25, dropout=0.25))(layer) for layer in layers]
+        lstms = [Bidirectional(LSTM(128, return_sequences=False, recurrent_dropout=0.25, dropout=0.25))(layer) for layer
+                 in layers]
 
         layers = [create_dense_network(layer, num_of_neurons=self.num_of_neurons[2]) for layer in lstms]
         lay = concatenate([layer for layer in layers])

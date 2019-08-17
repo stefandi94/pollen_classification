@@ -9,8 +9,8 @@ from source.models.dense_layers.dense_layers import create_dense_network
 
 
 class ANNCNN(BaseDLModel):
-    num_of_neurons = [300, 100]
-    convolution_filters = [64, 128, 256]
+    num_of_neurons = [1000, 500, 300]
+    convolution_filters = [32, 64, 64, 128, 128]
 
     def __init__(self,
                  **parameters: Any) -> None:
@@ -19,8 +19,8 @@ class ANNCNN(BaseDLModel):
     def build_model(self) -> None:
         inputs = [Input(input_shape) for input_shape in self.rnn_shapes.values()]
 
-        layers = [create_dense_network(layer, num_of_neurons=self.num_of_neurons) for layer in inputs]
-        layers = [create_cnn_network(layer, self.convolution_filters) for layer in layers]
+        layers = [create_cnn_network(layer, self.convolution_filters) for layer in inputs]
+        layers = [create_dense_network(layer, num_of_neurons=self.num_of_neurons) for layer in layers]
 
         layer = concatenate([layer for layer in layers])
         layer = Dropout(0.5)(layer)

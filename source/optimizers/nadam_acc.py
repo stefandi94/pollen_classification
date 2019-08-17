@@ -21,6 +21,7 @@ class NadamAccumulate(Optimizer):
         - [Nadam report](http://cs229.stanford.edu/proj2015/054_report.pdf)
         - [On the importance of initialization and momentum in deep learning](http://www.cs.toronto.edu/~fritz/absps/momentum.pdf)
     """
+
     def __init__(self, lr=0.002, beta_1=0.9, beta_2=0.999,
                  epsilon=None, schedule_decay=0.004, accum_iters=8, **kwargs):
         super(NadamAccumulate, self).__init__(**kwargs)
@@ -74,7 +75,7 @@ class NadamAccumulate(Optimizer):
             v_t = self.beta_2 * v + (1. - self.beta_2) * K.square(avg_grad)
             v_t_prime = v_t / (1. - K.pow(self.beta_2, t))
             m_t_bar = (1. - momentum_cache_t) * g_prime + (
-                momentum_cache_t_1 * m_t_prime)
+                    momentum_cache_t_1 * m_t_prime)
 
             p_t = p - self.lr * m_t_bar / (K.sqrt(v_t_prime) + self.epsilon)
 

@@ -9,7 +9,6 @@ from source.models.inception_net.layers import create_inception_model
 class Inception(BaseDLModel):
 
     def __init__(self, **parameters):
-
         super().__init__(**parameters)
 
     def build_model(self) -> None:

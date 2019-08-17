@@ -35,7 +35,6 @@ __all__ = ['EfficientNet', 'EfficientNetB0', 'EfficientNetB1', 'EfficientNetB2',
 class EfficientNet(BaseDLModel):
 
     def __init__(self, **parameters):
-
         super().__init__(**parameters)
 
     def build_model(self) -> "None":

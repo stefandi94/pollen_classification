@@ -17,7 +17,6 @@ class DropConnect(KL.Layer):
         self.drop_connect_rate = drop_connect_rate
 
     def call(self, inputs, training=None):
-
         def drop_connect():
             keep_prob = 1.0 - self.drop_connect_rate
 

@@ -184,5 +184,3 @@ def create_residual(in_layer: "Layer",
 
     layer = GlobalAvgPool2D()(layer)
     return layer
-
-

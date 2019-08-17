@@ -131,4 +131,3 @@ def count_values(array):
     """
     unique, counts = np.unique(array, return_counts=True)
     return dict(zip(unique, counts))
-
