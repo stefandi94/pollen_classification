@@ -1,4 +1,3 @@
-import os
 import os.path as osp
 
 RANDOM_STATE = 42
@@ -7,14 +6,24 @@ NUM_OF_CLASSES = 50
 # =======================================================================================================================
 
 # BASE DIRECTORY
-BASE_DIR = os.path.dirname(osp.realpath(__file__))
+BASE_DIR = osp.dirname(osp.realpath(__file__))
 
+RAW_DATA_DIR = osp.join(BASE_DIR, 'raw_data')
 # DATA DIRECTORY
 DATA_DIR = osp.join(BASE_DIR, 'data')
 
-TRAINING_DIR = osp.join(DATA_DIR, 'training')
+TRAIN_DIR = osp.join(DATA_DIR, 'training')
 VALID_DIR = osp.join(DATA_DIR, 'valid')
 TEST_DIR = osp.join(DATA_DIR, 'test')
+
+NORMALIZED_TRAIN_DIR = osp.join(TRAIN_DIR, 'normalized_data')
+STANDARDIZED_TRAIN_DIR = osp.join(TRAIN_DIR, 'standardized_data')
+
+NORMALIZED_VALID_DIR = osp.join(VALID_DIR, 'normalized_data')
+STANDARDIZED_VALID_DIR = osp.join(VALID_DIR, 'standardized_data')
+
+NORMALIZED_TEST_DIR = osp.join(TEST_DIR, 'normalized_data')
+STANDARDIZED_TEST_DIR = osp.join(TEST_DIR, 'standardized_data')
 
 # MODEL_DIR
 MODEL_DIR = osp.join(BASE_DIR, 'model_weights')

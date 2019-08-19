@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from datetime import datetime
 # preprocessing
+from utils.converting_raw_data import label_to_index
 
 
 def normalize_image(opd, cut, normalize=False, smooth=True):
@@ -161,14 +163,20 @@ def plot_tr(epoch_list, all_train_losses, all_validation_losses):
 
 if __name__ == '__main__':
 
+    targets = []
 
-    os.chdir('./../data/')
+    os.chdir('/mnt/hdd/data/')
     files = sorted(os.listdir())
     print(files)
     data = [[], [], [], [], []]
 
-    for file in files:
+    class_to_num = label_to_index(files)
 
+    for file in files:
+        if file.split(".")[-1] != 'json':
+            continue
+
+        print(f'Current file is {file} and time is {datetime.now().time()}')
         raw_data = json.loads(open(file).read())
         data_list = [[], [], [], [], []]
 
@@ -176,15 +184,7 @@ if __name__ == '__main__':
                 file.split(".")[0] == "Corylus" or file.split(".")[0] == "Cupressus" or file.split(".")[
             0] == "Fraxinus excelsior" or file.split(".")[0] == "Ulmus":
             for i in range(len(raw_data)):
-                specmax = np.max(raw_data[i]["Spectrometer"])
-                # x = np.sum([np.float64(j) for j in raw_data["Data"][i]["Scattering"]["Image"] ])
-                # if x < 5500000:
-                #    integral_D = 0.5
-                # elif (x >= 5500000) and (x < 500000000):
-                #    integral_D = 9.95e-01 * np.log(3.81e-05 * x) - 4.84e+00
-                # else:
-                #    integral_D = 0.0004*x**0.5 - 3.9
-
+                specmax = np.max(raw_data["Data"][i]["Spectrometer"])
                 if specmax > 2500:  # preprocessing
 
                     scat = normalize_image(raw_data[i], cut=60, normalize=False, smooth=True)
@@ -202,14 +202,6 @@ if __name__ == '__main__':
         else:
             for i in range(len(raw_data["Data"])):
                 specmax = np.max(raw_data["Data"][i]["Spectrometer"])
-                # x = np.sum([np.float64(j) for j in raw_data["Data"][i]["Scattering"]["Image"] ])
-                # if x < 5500000:
-                #    integral_D = 0.5
-                # elif (x >= 5500000) and (x < 500000000):
-                #    integral_D = 9.95e-01 * np.log(3.81e-05 * x) - 4.84e+00
-                # else:
-                #    integral_D = 0.0004*x**0.5 - 3.9
-
                 if specmax > 2500:  # preprocessing
 
                     scat = normalize_image(raw_data["Data"][i], cut=60, normalize=False, smooth=True)

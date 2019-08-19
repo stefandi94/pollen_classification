@@ -11,7 +11,7 @@ from source.models.dense_layers.dense_layers import create_dense_network
 class CNN(BaseDLModel):
     # num_of_neurons = [[200, 50],
     #                   [200, 50]]
-    convolution_filters = [32, 32, 64, 64, 128]
+    convolution_filters = [32, 32, 64, 64]
 
     def __init__(self,
                  **parameters: Any) -> None:

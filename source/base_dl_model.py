@@ -99,15 +99,12 @@ class BaseDLModel:
         # self.model.compile(loss='categorical_crossentropy',
         #                    optimizer=self.optimizer(self.learning_rate),
         #                    metrics=['accuracy', top_k_categorical_accuracy, self.precision, self.recall, self.f1])
-        self.model.compile(loss=['categorical_crossentropy',
-                                 'categorical_crossentropy',
-                                 'categorical_crossentropy'],
-                           loss_weights=[1, 0.6, 0.4],
+        self.model.compile(loss=['categorical_crossentropy'],
                            optimizer=self.optimizer(self.learning_rate),
                            metrics=['accuracy', top_k_categorical_accuracy, self.precision, self.recall, self.f1])
 
-                           # weights_name = "{epoch}-{loss:.3f}-{acc:.3f}-{val_loss:.3f}-{val_acc:.3f}.hdf5"
-        weights_name = "{epoch}-{dense_1_loss:.3f}-{dense_1_acc:.3f}-{val_dense_1_loss:.3f}-{val_dense_1_acc:.3f}.hdf5"
+        weights_name = "{epoch}-{loss:.3f}-{acc:.3f}-{val_loss:.3f}-{val_acc:.3f}.hdf5"
+    # weights_name = "{epoch}-{dense_1_loss:.3f}-{dense_1_acc:.3f}-{val_dense_1_loss:.3f}-{val_dense_1_acc:.3f}.hdf5"
 
         # print(self.model.summary())
         with open(osp.join(self.save_dir, 'model_summary.txt'), 'w') as f:

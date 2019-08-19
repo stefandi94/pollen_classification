@@ -4,7 +4,8 @@ from typing import List, Tuple
 import numpy as np
 import os.path as osp
 
-from settings import TRAINING_DIR, VALID_DIR, TEST_DIR
+from settings import TRAIN_DIR, VALID_DIR, TEST_DIR
+from split_data import load_data
 
 
 def create_3_channels(array: np.ndarray) -> np.ndarray:
@@ -26,20 +27,24 @@ def create_3d_array(array: np.ndarray) -> np.ndarray:
     :param array:
     :return: array
     """
+    array = np.reshape(array, (array.shape[0], array.shape[1], 1))
+    return array
+
+
+def create_4d_array(array: np.ndarray) -> np.ndarray:
     array = np.reshape(array, (array.shape[0], array.shape[1], array.shape[2], 1))
     return array
 
 
-def read_data(name: str, tip: str, normalized: bool) -> Tuple[np.ndarray, np.ndarray]:
+def read_data(name: str, tip: str, load_labels: bool = False) -> Tuple[np.ndarray, np.ndarray]:
     """
     :param name: Name of the type of feature to load
     :param tip: Train, valid or test data
-    :param normalized:
     :return: Tuple with data as first element and classes as second
     """
 
     if tip == 'train':
-        dire = TRAINING_DIR
+        dire = TRAIN_DIR
     elif tip == 'valid':
         dire = VALID_DIR
     elif tip == 'test':
@@ -48,25 +53,22 @@ def read_data(name: str, tip: str, normalized: bool) -> Tuple[np.ndarray, np.nda
     with open(osp.join(dire, 'target.pckl'), 'rb') as fp:
         y = pickle.load(fp)
 
-    if normalized:
-        name = 'normalized_' + name
-
     with open(osp.join(dire, f'{name}.pckl'), 'rb') as fp:
         X = pickle.load(fp)
 
-    return X, np.array(y)
+    if load_labels:
+        return X, np.array(y)
+    else:
+        return X
 
 
-def load_all_data(tip: str, normalized: bool = False) -> Tuple[List[np.ndarray], np.ndarray]:
-    """
-    :param tip: Which data to load - train, valid or test
-    :param normalized: Boolean to normalize data with keras normalize function
-    :return:
-    """
+def load_all_data(data_path: str) -> Tuple[List[np.ndarray], np.ndarray]:
 
-    X_size, _ = read_data('size', tip, normalized)
-    X_life_1, _ = read_data('life_1', tip, normalized)
-    X_life_2_cut, _ = read_data('life_2_cut', tip, normalized)
-    X_image, y_image = read_data('image', tip, normalized)
+    X_scatter = load_data(data_path, 'scatter')
+    X_size = load_data(data_path, 'size')
+    X_life_1 = load_data(data_path, 'life_1')
+    X_spectrum = load_data(data_path, 'spectrum')
+    X_life_2 = load_data(data_path, 'life_2')
+    y = load_data(data_path, 'target')
 
-    return [X_image, X_life_1, X_size, X_life_2_cut], y_image
+    return [X_scatter, X_size, X_life_1, X_spectrum, X_life_2], y
