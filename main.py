@@ -5,7 +5,8 @@ from keras.optimizers import Adam, Adagrad
 from sklearn.decomposition import PCA
 from sklearn.metrics import f1_score, recall_score, accuracy_score
 import numpy as np
-from settings import NUM_OF_CLASSES, NORMALIZED_TRAIN_DIR, NORMALIZED_VALID_DIR
+from settings import NUM_OF_CLASSES, NORMALIZED_TRAIN_DIR, NORMALIZED_VALID_DIR, STANDARDIZED_TRAIN_DIR, \
+    STANDARDIZED_VALID_DIR
 from source.data_reader import load_all_data, create_3d_array, create_4d_array
 from source.models import ResidualNet, ANNCNN, CNN
 from source.plotting_predictions import plot_confidence, plot_classes
@@ -14,7 +15,8 @@ from utils.utilites import calculate_weights, smooth_labels
 from xgboost import XGBClassifier
 
 parameters = dict(epochs=20, batch_size=64, optimizer=Adam, learning_rate=0.007,
-                  save_dir='./model_weights/cnn/')
+                  save_dir=f'./model_weights/cnn/standardized_data/adam/')
+                  # load_dir='./model_weights/cnn/4-2.794-0.308-2.256-0.365.hdf5')
 
 smooth_factor = 0.1
 rnn_shapes = dict(input_shape_1=(20, 120, 1),
@@ -24,14 +26,13 @@ rnn_shapes = dict(input_shape_1=(20, 120, 1),
 
 if __name__ == '__main__':
 
-    X_train, y_train = load_all_data(NORMALIZED_TRAIN_DIR)
-    X_valid, y_valid = load_all_data(NORMALIZED_VALID_DIR)
+    X_train, y_train = load_all_data(STANDARDIZED_TRAIN_DIR)
+    X_valid, y_valid = load_all_data(STANDARDIZED_VALID_DIR)
 
     X_train.pop(1)  # remove 1x1 feature
     X_valid.pop(1)
 
     for index in range(len(X_train)):
-
         if len(X_train[index].shape) < 3:
             X_train[index] = create_3d_array(X_train[index])
 
@@ -60,21 +61,6 @@ if __name__ == '__main__':
     plot_confidence(y_valid, y_pred)
     plot_classes(y_valid, y_pred)
 
-    # train_split = int(0.7*len(X_train[0]))
-    # X_train[0] = X_train[0][:train_split]
-    # X_train[1] = X_train[1][:train_split]
-    # X_train[2] = X_train[2][:train_split]
-    # X_train[3] = X_train[3][:train_split]
-    # X_train[4] = X_train[4][:train_split]
-    # y_train = y_train[:train_split]
-    #
-    # val_split = int(len(X_valid[0]))
-    # X_valid[0] = X_valid[0][:val_split]
-    # X_valid[1] = X_valid[1][:val_split]
-    # X_valid[2] = X_valid[2][:val_split]
-    # X_valid[3] = X_valid[3][:val_split]
-    # X_valid[4] = X_valid[4][:val_split]
-    # y_valid = y_valid[:val_split]
     # new_x_train = flatten_data(X_train)
     # new_x_valid = flatten_data(X_valid)
     #

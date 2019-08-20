@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 
 from settings import RAW_DATA_DIR, DATA_DIR
+from split_data import load_data
 from utils.preprocessing import label_to_index, calculate_and_check_shapes
 
 
@@ -48,7 +49,6 @@ def transform_raw_data(raw_data_path):
 def create_lifetime(data):
     lista = []
     for i in range(len(data[2])):
-
         if i == 0:
             l = ["Cupressus"]
         elif i == 1:
@@ -70,12 +70,14 @@ def create_lifetime(data):
     amb = pd.DataFrame(columns=features)
 
     for i in range(len(lista)):
-        for j in range(len(lista[i])):
-            amb.loc[len(amb)] = lista[i][j]
+        print(f'Current index is {i}')
+        amb.loc[len(amb)] = lista[i]
 
     amb.to_csv("./../data/Time of lifetime.csv", index=False)
 
 
 if __name__ == '__main__':
     raw_data_dir = '/mnt/hdd/data/'
-    transform_raw_data(raw_data_dir)
+    # transform_raw_data(raw_data_dir)
+    data = load_data(raw_data_dir, 'data')
+    create_lifetime(data)

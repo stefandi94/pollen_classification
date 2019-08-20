@@ -23,7 +23,7 @@ class CNNRNN(BaseDLModel):
     def build_model(self) -> None:
         inputs_1 = [Input(input_shape) for input_shape in self.rnn_shapes.values()]
         layers_1 = [Flatten()(layer) for layer in inputs_1]
-        layers_1 = [create_dense_network(layer, num_of_neurons=[100]) for layer in layers_1]
+        layers_1 = [create_cnn_network(layer, [100], one_d=True) for layer in layers_1]
         layer_1 = concatenate([layer for layer in layers_1])
         layer_1 = Reshape((int(layer_1.shape[1]), 1))(layer_1)
         layer_1 = LSTM(128, return_sequences=False, recurrent_dropout=0.2, kernel_regularizer=l1_l2(KERNEL_REGULARIZER),

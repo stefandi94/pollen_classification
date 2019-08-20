@@ -1,12 +1,12 @@
+from functools import partial
 from typing import List, Tuple
 
 import keras
 from keras.engine import Layer
 from keras.initializers import Initializer
-from keras.layers import Conv2D, BatchNormalization, Activation, Dropout, GlobalAvgPool2D, LeakyReLU, SpatialDropout2D
-from keras.regularizers import Regularizer, l1_l2
-
-from settings import KERNEL_REGULARIZER, BIAS_REGULARIZER, ACTIVITY_REGULARIZER
+from keras.layers import Conv2D, BatchNormalization, GlobalAvgPool2D, LeakyReLU, SpatialDropout2D, \
+    Conv1D
+from keras.regularizers import Regularizer
 
 kernel_init = keras.initializers.glorot_uniform()
 bias_init = keras.initializers.Constant(value=0.2)
@@ -21,7 +21,8 @@ def create_cnn_layer(input_layer: "Layer",
                      bias_init: str or "Initializer" = bias_init,
                      strides: int or Tuple[int, int] = (1, 1),
                      kernel_regularizer: Regularizer = None,
-                     activation: bool = True) -> "Layer":
+                     activation: bool = True,
+                     one_d: bool = False) -> "Layer":
     """
     Given input layer and number of filters, do 2D convolution
     :param input_layer: Input layer
@@ -34,16 +35,21 @@ def create_cnn_layer(input_layer: "Layer",
     :param strides
     :param kernel_regularizer
     :param activation
+    :param one_d: whether to do 1D or 2D convolution
     :return: Layer
     """
+    if one_d:
+        conv = Conv1D
+    else:
+        conv = Conv2D
 
-    layer = Conv2D(num_filter,
-                   strides=strides,
-                   kernel_size=kernel_size,
-                   padding='same',
-                   kernel_initializer=kernel_init,
-                   bias_initializer=bias_init,
-                   kernel_regularizer=kernel_regularizer)(input_layer)
+    layer = conv(num_filter,
+                 strides=strides,
+                 kernel_size=kernel_size,
+                 padding='same',
+                 kernel_initializer=kernel_init,
+                 bias_initializer=bias_init,
+                 kernel_regularizer=kernel_regularizer)(input_layer)
 
     if batch_normalization:
         layer = BatchNormalization()(layer)
@@ -56,16 +62,26 @@ def create_cnn_layer(input_layer: "Layer",
 
 
 def create_cnn_network(input_layer: "Layer",
-                       num_of_filters: List[int]) -> "Layer":
+                       num_of_filters: List[int],
+                       kernels: List[int] or List[Tuple] = None,
+                       one_d: bool = False) -> "Layer":
     """
     Given input layer and number of filters, creates network
     :param input_layer:
     :param num_of_filters:
+    :param kernels:
+    :param one_d: Conv1D or Conv2D
     :return:
     """
+    if kernels is None:
+        kernels = [(3, 3)] * len(num_of_filters)
 
     layer = input_layer
     for index, filter in enumerate(num_of_filters):
-        layer = create_cnn_layer(input_layer=layer, num_filter=filter, dropout=0.2)
+        layer = create_cnn_layer(input_layer=layer,
+                                 num_filter=filter,
+                                 kernel_size=kernels[index],
+                                 dropout=0.2,
+                                 one_d=one_d)
     layer = GlobalAvgPool2D()(layer)
     return layer

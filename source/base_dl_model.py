@@ -51,7 +51,6 @@ class BaseDLModel:
         self.load_dir = None
 
         self.optimizer = None
-        self.learning_rate = 0.001
 
         for k in kwargs.keys():
             if k not in allowed_kwargs:
@@ -100,7 +99,7 @@ class BaseDLModel:
         #                    optimizer=self.optimizer(self.learning_rate),
         #                    metrics=['accuracy', top_k_categorical_accuracy, self.precision, self.recall, self.f1])
         self.model.compile(loss=['categorical_crossentropy'],
-                           optimizer=self.optimizer(self.learning_rate),
+                           optimizer=self.optimizer(),
                            metrics=['accuracy', top_k_categorical_accuracy, self.precision, self.recall, self.f1])
 
         weights_name = "{epoch}-{loss:.3f}-{acc:.3f}-{val_loss:.3f}-{val_acc:.3f}.hdf5"
@@ -119,7 +118,7 @@ class BaseDLModel:
                                      save_best_only=False,
                                      mode='max')
 
-        clr = CyclicLR(base_lr=0.002, max_lr=0.01, mode='exp_range')
+        clr = CyclicLR(base_lr=0.001, max_lr=0.01, mode='triangular')
         csv_logger = CSVLogger(osp.join(self.save_dir, "model_history_log.csv"), append=True)
         callbacks_list = [checkpoint, csv_logger, clr]
 
