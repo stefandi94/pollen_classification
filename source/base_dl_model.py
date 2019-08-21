@@ -118,7 +118,7 @@ class BaseDLModel:
                                      save_best_only=False,
                                      mode='max')
 
-        clr = CyclicLR(base_lr=0.001, max_lr=0.01, mode='triangular')
+        clr = CyclicLR(base_lr=0.001, max_lr=0.01, mode='triangular', step_size=len(X_train[0] // (2 * self.batch_size)))
         csv_logger = CSVLogger(osp.join(self.save_dir, "model_history_log.csv"), append=True)
         callbacks_list = [checkpoint, csv_logger, clr]
 

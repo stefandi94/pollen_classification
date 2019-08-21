@@ -28,7 +28,7 @@ def normalize_image(opd, cut, normalize=False, smooth=True):
         # im[:,22:24] = 0
         im = np.transpose(im)
         if normalize:
-            return np.asarray(im / im.sum())
+            return np.asarray(im / im.sum()).astype('float32')
         else:
             return np.asarray(im).astype('float32')
 
@@ -93,7 +93,7 @@ def spec_correction(opd, normalize=True):
         if A.max() > 0:
             return (A / A.max()).astype('float32')
     else:
-        return res_spec
+        return res_spec.astype('float32')
 
 
 def size_particle(opd, scale_factor=1):
@@ -129,6 +129,7 @@ def label_to_index(files):
 
 
 def check_shapes(file, shape_type, is_list=False):
+
     if is_list:
         if len(file) == 0:
             return False
@@ -164,24 +165,31 @@ def check_shapes(file, shape_type, is_list=False):
             return True
 
 
-def calculate_and_check_shapes(file_data, file_name, spec_max, data, targets, class_to_num):
+def check_all_shapes(scat, life1, spec, size):
+
+    if scat is not None and life1 is not None and \
+            spec is not None and size is not None and \
+            check_shapes(scat, is_list=True, shape_type=0) and \
+            check_shapes(size, shape_type=1) and \
+            check_shapes(life1[0], is_list=True, shape_type=2) and \
+            check_shapes(spec, is_list=True, shape_type=3) and \
+            check_shapes(life1[1], shape_type=4):
+        return True
+    else:
+        return False
+
+
+def calculate_and_check_shapes(file_data, file_name, spec_max, data, labels, class_to_num):
     if spec_max > 2500:
         scat = normalize_image(file_data, cut=60, normalize=False, smooth=True)
         life1 = normalize_lifitime(file_data, normalize=True)
         spec = spec_correction(file_data, normalize=True)
         size = size_particle(file_data, scale_factor=1)
 
-        if scat is not None and life1 is not None and \
-                spec is not None and size is not None and \
-                check_shapes(scat, is_list=True, shape_type=0) and \
-                check_shapes(size, shape_type=1) and \
-                check_shapes(life1[0], is_list=True, shape_type=2) and \
-                check_shapes(spec, is_list=True, shape_type=3) and \
-                check_shapes(life1[1], shape_type=4):
-
-            data[0].append(scat.astype('float32'))
-            data[1].append(size.astype('float32'))
-            data[2].append(life1[0].astype('float32'))
-            data[3].append(spec.astype('float32'))
-            data[4].append(life1[1].astype('float32'))
-            targets.append(class_to_num[convert_filename_to_label(file_name)])
+        if check_all_shapes(scat, life1, spec, size):
+            data["scatter"].append(scat)
+            data["size"].append(size)
+            data["life_1"].append(life1[0])
+            data["spectrum"].append(spec)
+            data["life_2"].append(life1[1])
+            labels.append(class_to_num[convert_filename_to_label(file_name)])

@@ -4,7 +4,7 @@ from typing import List, Tuple
 import numpy as np
 import os.path as osp
 
-from settings import TRAIN_DIR, VALID_DIR, TEST_DIR
+from settings import NS_TRAIN_DIR, NS_VALID_DIR, NS_TEST_DIR
 from split_data import load_data
 
 
@@ -44,11 +44,11 @@ def read_data(name: str, tip: str, load_labels: bool = False) -> Tuple[np.ndarra
     """
 
     if tip == 'train':
-        dire = TRAIN_DIR
+        dire = NS_TRAIN_DIR
     elif tip == 'valid':
-        dire = VALID_DIR
+        dire = NS_VALID_DIR
     elif tip == 'test':
-        dire = TEST_DIR
+        dire = NS_TEST_DIR
 
     with open(osp.join(dire, 'target.pckl'), 'rb') as fp:
         y = pickle.load(fp)
@@ -69,6 +69,6 @@ def load_all_data(data_path: str) -> Tuple[List[np.ndarray], np.ndarray]:
     X_life_1 = load_data(data_path, 'life_1')
     X_spectrum = load_data(data_path, 'spectrum')
     X_life_2 = load_data(data_path, 'life_2')
-    y = load_data(data_path, 'target')
+    y = load_data(data_path, 'labels')
 
     return [X_scatter, X_size, X_life_1, X_spectrum, X_life_2], y
