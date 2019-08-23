@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+   web:
+    container_name: client_prospecting_ml_api
+    build: ./
+    environment:
+      - DJANGO_SECRET_KEY
+    ports:
+      - "8000:8000"
+    stdin_open: true

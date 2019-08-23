@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>WM</title>
+    </head>
+
+    <body>
+
+
+        <!-- Upload form. Note enctype attribute! -->
+        <form action="{% url "predict" %}" method="post" enctype="multipart/form-data">
+            <p>{{ form.non_field_errors }}</p>
+
+            <p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
+
+            <p>
+                {{ form.docfile.errors }}
+                {{ form.docfile }}
+            </p>
+
+            <p><input type="submit" value="Predict"/></p>
+        </form>
+    </body>
+
+</html>

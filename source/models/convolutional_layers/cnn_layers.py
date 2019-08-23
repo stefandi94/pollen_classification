@@ -5,7 +5,7 @@ import keras
 from keras.engine import Layer
 from keras.initializers import Initializer
 from keras.layers import Conv2D, BatchNormalization, GlobalAvgPool2D, LeakyReLU, SpatialDropout2D, \
-    Conv1D
+    Conv1D, Activation, Dropout
 from keras.regularizers import Regularizer
 
 kernel_init = keras.initializers.glorot_uniform()
@@ -54,9 +54,9 @@ def create_cnn_layer(input_layer: "Layer",
     if batch_normalization:
         layer = BatchNormalization()(layer)
     if activation:
-        layer = LeakyReLU()(layer)
+        layer = Activation('relu')(layer)
 
-    layer = SpatialDropout2D(dropout)(layer)
+    layer = Dropout(dropout)(layer)
 
     return layer
 

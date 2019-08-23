@@ -1,13 +1,10 @@
 from typing import Any
 
 from keras import Input, Model
-from keras.layers import Flatten, concatenate, Dense, LSTM, Reshape, Dropout
-from keras.regularizers import l1_l2
+from keras.layers import Flatten, concatenate, Dense, LSTM, Dropout
 
-from settings import KERNEL_REGULARIZER, ACTIVITY_REGULARIZER, BIAS_REGULARIZER
 from source.base_dl_model import BaseDLModel
 from source.models.convolutional_layers.cnn_layers import create_cnn_network
-from source.models.dense_layers.dense_layers import create_dense_network
 
 
 class CNN1DRNN(BaseDLModel):

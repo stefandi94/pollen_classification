@@ -193,3 +193,4 @@ def calculate_and_check_shapes(file_data, file_name, spec_max, data, labels, cla
             data["spectrum"].append(spec)
             data["life_2"].append(life1[1])
             labels.append(class_to_num[convert_filename_to_label(file_name)])
+

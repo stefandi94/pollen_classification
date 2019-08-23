@@ -4,7 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from settings import NUM_OF_CLASSES
+from utils.settings import NUM_OF_CLASSES
 from utils.utilites import count_values
 
 

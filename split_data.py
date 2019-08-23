@@ -1,25 +1,29 @@
+import operator
 import os
 import os.path as osp
-import pickle
 from datetime import datetime
 
 import numpy as np
+import pandas as pd
 
-from settings import RANDOM_STATE, NS_RAW_DATA_DIR, NS_DATA_DIR
 from utils.converting_raw_data import transform_raw_data
+from utils.settings import RANDOM_STATE, NS_RAW_DATA_DIR, NS_DATA_DIR
+from utils.utilites import count_values
 
 np.random.seed(RANDOM_STATE)
 
 
 def load_data(data_path, filename):
-    with open(osp.join(data_path, f'{filename}.pckl'), 'rb') as handle:
-        data = pickle.load(handle)
+    # with open(osp.join(data_path, f'{filename}.pckl'), 'rb') as handle:
+    #     data = pickle.load(handle)
+    data = np.load(osp.join(data_path, f'{filename}.npy'))
     return data
 
 
 def save_data(file, data_path, filename):
-    with open(osp.join(data_path, f'{filename}.pckl'), 'wb') as handle:
-        pickle.dump(file, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    np.save(osp.join(data_path, f'{filename}.npy'), file)
+    # with open(osp.join(data_path, f'{filename}.pckl'), 'wb') as handle:
+    #     pickle.dump(file, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def create_train_valid_test_data(data: dict,
@@ -63,19 +67,6 @@ def create_train_valid_test_data(data: dict,
     return data_to_save, labels_to_save
 
 
-def flatten_data(data):
-    new_train_data = np.zeros((len(data["scatter"]), 2629))
-    for vector_index in range(len(data["scatter"])):
-        new_vector = []
-        for feature_index, vector in enumerate(data):
-            if feature_index == 1:
-                new_vector.extend([vector[vector_index]])
-            else:
-                new_vector.extend(np.array(vector[vector_index]).flatten())
-        new_train_data[vector_index] = new_vector
-    return new_train_data
-
-
 def find_statistical_components(data):
     data = np.array(data).flatten()
 
@@ -107,11 +98,11 @@ def split_and_save_data(raw_data_path,
                         data_normalization=True,
                         data_standardization=True):
     print(f'Started transforming raw data at {datetime.now().time()}')
-    feature_names, files, filenames = transform_raw_data(raw_data_path)
+    data, labels, label_to_index, feature_names = transform_raw_data(raw_data_path)
 
     print(f'Started creating train/test data {datetime.now().time()}')
-    data_to_save, labels_to_save = create_train_valid_test_data(data=files["data"],
-                                                                labels=files["labels"])
+    data_to_save, labels_to_save = create_train_valid_test_data(data=data,
+                                                                labels=labels)
     dirs_to_save = ['train', 'valid', 'test']
     for feature_index, feature in enumerate(feature_names):
         print(f'Current feature is {feature} {datetime.now().time()}')
@@ -125,11 +116,17 @@ def split_and_save_data(raw_data_path,
 
             if data_type == "train":
                 stat_comp = find_statistical_components(data_to_save[dir_index][feature_index])
-                save_data(stat_comp, data_path, filename=f'{feature}_stat_comp')
+                save_data(file=stat_comp,
+                          data_path=data_path,
+                          filename=f'{feature}_stat_comp')
+                # save_data(stat_comp, data_path, filename=f'{feature}_stat_comp')
 
             save_data(file=data_to_save[dir_index][feature_index],
                       data_path=data_path,
                       filename=feature)
+            # save_data(file=data_to_save[dir_index][feature_index],
+            #           data_path=data_path,
+            #           filename=feature)
 
             if data_standardization:
                 standardized_path = osp.join(data_path, 'standardized_data')
@@ -141,6 +138,11 @@ def split_and_save_data(raw_data_path,
                                                 stat_comp["max"]),
                           data_path=standardized_path,
                           filename=feature)
+                # save_data(file=standardize_data(data_to_save[dir_index][feature_index],
+                #                                 stat_comp["min"],
+                #                                 stat_comp["max"]),
+                #           data_path=standardized_path,
+                #           filename=feature)
 
             if data_normalization:
                 normalize_path = osp.join(data_path, 'normalized_data')
@@ -148,53 +150,68 @@ def split_and_save_data(raw_data_path,
                     os.makedirs(normalize_path)
 
                 save_data(file=normalize_data(data_to_save[dir_index][feature_index],
-                                              stat_comp["mean"],
-                                              stat_comp["std"]),
+                                              stat_comp["min"],
+                                              stat_comp["max"]),
                           data_path=normalize_path,
                           filename=feature)
+                # save_data(file=normalize_data(data_to_save[dir_index][feature_index],
+                #                               stat_comp["mean"],
+                #                               stat_comp["std"]),
+                #           data_path=normalize_path,
+                #           filename=feature)
+            save_data(file=labels_to_save[dir_index],
+                      data_path=data_path,
+                      filename='labels')
+            # save_data(file=labels_to_save[dir_index],
+            #           data_path=data_path,
+            #           filename="labels")
 
-        save_data(file=labels_to_save[dir_index],
-                  data_path=data_path,
-                  filename="target")
+
+def prepare_new_data(data_path):
+    data, labels, label_to_index, feature_names = transform_raw_data(data_path)
+
+
+def cut_classes(data, labels, num_of_class=None, top=True, classes_to_take=None):
+    new_data = [[] for feature in data]
+    new_labels = []
+
+    if classes_to_take is None:
+        c_v = count_values(labels)
+        sorted_x = sorted(c_v.items(), key=operator.itemgetter(1))
+
+        if top:
+            classes_to_take = [clas for (clas, num_samples) in sorted_x[-num_of_class:]]
+        else:
+            classes_to_take = [clas for (clas, num_samples) in sorted_x[:num_of_class]]
+
+    for index, label in enumerate(labels):
+        if label in classes_to_take:
+            new_labels.append(label)
+            for feature_index in range(len(data)):
+                new_data[feature_index].append(data[feature_index][index])
+
+    new_data = [np.array(feature) for feature in new_data]
+    return new_data, np.array(new_labels), classes_to_take
+
+
+def label_mappings(classes_to_take):
+    dict_mapping = dict()
+
+    for index, label in enumerate(classes_to_take):
+        dict_mapping[label] = index
+
+    return dict_mapping
+
+
+def create_csv(data):
+    dict_with_features = {}
+    feature_names = ["scatter", "life", "spectrum"]
+    for index, feature in enumerate(data):
+        dict_with_features[feature_names[index]] = list(feature)
+    df = pd.DataFrame.from_dict(dict_with_features)
+    return df
 
 
 if __name__ == '__main__':
-    split_data = True
-    standardize = True
-    normalize = True
-    raw_data_dir = NS_RAW_DATA_DIR
-    output_data_dir = NS_DATA_DIR
 
-    data, labels, label_to_index, feature_names = transform_raw_data(NS_RAW_DATA_DIR)
-
-    if split_data:
-        [train_data, valid_data, test_data], [train_labels, valid_labels, test_labels] = create_train_valid_test_data(
-            data=data,
-            labels=labels)
-
-        for feature_index, feature in enumerate(train_data):
-            stat_comp = find_statistical_components(feature)
-            save_data(file=stat_comp,
-                      data_path=output_data_dir,
-                      filename=f'stat_comp{feature_names[feature_index]}')
-
-            save_data(file=labels[feature_index],
-                      data_path=output_data_dir,
-                      filename="labels")
-
-            for data in [train_data, valid_data, test_data]:
-                if normalize:
-                    save_data(file=normalize_data(data[feature_index],
-                                                  stat_comp["mean"],
-                                                  stat_comp["std"]),
-                              data_path=osp.join(output_data_dir, 'normalized'),
-                              filename=feature_names[feature_index])
-                if standardize:
-                    save_data(file=standardize_data(data[feature_index],
-                                                    stat_comp["min"],
-                                                    stat_comp["max"]),
-                              data_path=osp.join(output_data_dir, 'standardized'),
-                              filename=feature)
-
-    print()
-    # split_and_save_data(NS_RAW_DATA_DIR, NS_DATA_DIR)
+    split_and_save_data(NS_RAW_DATA_DIR, NS_DATA_DIR)

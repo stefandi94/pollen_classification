@@ -1,10 +1,8 @@
 from typing import Any
 
 from keras import Input, Model
-from keras.layers import Flatten, concatenate, Dense, LSTM, Reshape, Dropout, BatchNormalization, Activation, LeakyReLU
-from keras.regularizers import l1_l2
+from keras.layers import Flatten, concatenate, Dense, LSTM, Reshape
 
-from settings import BIAS_REGULARIZER, ACTIVITY_REGULARIZER, KERNEL_REGULARIZER
 from source.base_dl_model import BaseDLModel
 from source.models.convolutional_layers.cnn_layers import create_cnn_network
 from source.models.dense_layers.dense_layers import create_dense_network

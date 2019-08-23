@@ -1,10 +1,7 @@
 from typing import List
 
 from keras.engine import Layer
-from keras.layers import Dense, BatchNormalization, Activation, Dropout, LeakyReLU
-from keras.regularizers import l1_l2
-
-from settings import KERNEL_REGULARIZER, BIAS_REGULARIZER, ACTIVITY_REGULARIZER
+from keras.layers import Dense, BatchNormalization, Dropout, LeakyReLU
 
 
 def create_dense_network(input_layer: "Layer",

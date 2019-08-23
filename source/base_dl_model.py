@@ -12,7 +12,7 @@ from keras.metrics import top_k_categorical_accuracy
 from keras.utils import plot_model
 from keras_self_attention import SeqSelfAttention
 
-from settings import NUM_OF_CLASSES
+from utils.settings import NUM_OF_CLASSES
 from source.learning_rates.cyclical_lr import CyclicLR
 from utils.utilites import multiple_generator
 
@@ -118,7 +118,10 @@ class BaseDLModel:
                                      save_best_only=False,
                                      mode='max')
 
-        clr = CyclicLR(base_lr=0.001, max_lr=0.01, mode='triangular', step_size=len(X_train[0] // (2 * self.batch_size)))
+        clr = CyclicLR(base_lr=0.001,
+                       max_lr=0.01,
+                       mode='triangular',
+                       step_size=len(X_train[0]) // (2 * self.batch_size))
         csv_logger = CSVLogger(osp.join(self.save_dir, "model_history_log.csv"), append=True)
         callbacks_list = [checkpoint, csv_logger, clr]
 
@@ -142,8 +145,8 @@ class BaseDLModel:
 
     def predict(self, X_test: List[np.ndarray] or np.ndarray) -> List[Tuple[int, float]]:
         """Return prediction for given data."""
-        self.load_model(self.load_dir)
-        print(f'Model is loaded from {self.load_dir}')
+        # self.load_model(self.load_dir)
+        # print(f'Model is loaded from {self.load_dir}')
 
         all_predictions = self.model.predict(X_test)
         predicted_class = np.argmax(all_predictions, axis=1)
