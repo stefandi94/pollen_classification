@@ -11,6 +11,9 @@ from keras.callbacks import ModelCheckpoint, CSVLogger
 from keras.metrics import top_k_categorical_accuracy
 from keras.utils import plot_model
 from keras_self_attention import SeqSelfAttention
+from hyperas import optim
+from hyperopt import Trials, STATUS_OK, tpe
+from hyperas.distributions import choice, uniform
 
 from utils.settings import NUM_OF_CLASSES
 from source.learning_rates.cyclical_lr import CyclicLR
@@ -18,13 +21,11 @@ from utils.utilites import multiple_generator
 
 
 class BaseDLModel:
-    cnn_shapes = {
-        'input_shape_1': (4, 32, 1),
+
+    shapes = {
+        'input_shape_1': (20, 120, 1),
         'input_shape_2': (4, 24, 1),
-    }
-    rnn_shapes = {
-        'input_shape_3': (20, 120, 1),
-        'input_shape_4': (5, 1, 1)
+        'input_shape_3': (4, 32, 1),
     }
 
     def __init__(self,
@@ -40,12 +41,14 @@ class BaseDLModel:
         :param kwargs:
         """
 
-        allowed_kwargs = ['save_dir', 'load_dir', 'batch_size', 'epochs', 'optimizer', 'learning_rate']
+        allowed_kwargs = ['save_dir', 'load_dir', 'batch_size', 'epochs', 'optimizer', 'learning_rate', 'shape']
 
         self.model = None
         self.epochs = epochs
         self.batch_size = batch_size
         self.num_classes = num_classes
+        self.cnn_shape = [(20, 120, 1), (4, 24, 1), (4, 32, 1)]
+        self.rnn_shape = [(20, 120), (4, 24), (4, 32)]
 
         self.save_dir = None
         self.load_dir = None
@@ -95,9 +98,6 @@ class BaseDLModel:
             self.load_model(self.load_dir)
             print(f'Model is loaded from {self.load_dir}')
 
-        # self.model.compile(loss='categorical_crossentropy',
-        #                    optimizer=self.optimizer(self.learning_rate),
-        #                    metrics=['accuracy', top_k_categorical_accuracy, self.precision, self.recall, self.f1])
         self.model.compile(loss=['categorical_crossentropy'],
                            optimizer=self.optimizer(),
                            metrics=['accuracy', top_k_categorical_accuracy, self.precision, self.recall, self.f1])
@@ -131,7 +131,9 @@ class BaseDLModel:
                            verbose=1,
                            epochs=self.epochs,
                            batch_size=self.batch_size,
-                           callbacks=callbacks_list)
+                           callbacks=callbacks_list,
+                           shuffle=True,
+                           class_weight=weight_class)
 
         else:
             self.model.fit_generator(multiple_generator(X_train, y_train, batch_size=self.batch_size),

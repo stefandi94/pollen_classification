@@ -63,6 +63,7 @@ def create_cnn_layer(input_layer: "Layer",
 
 def create_cnn_network(input_layer: "Layer",
                        num_of_filters: List[int],
+                       dropout: float = 0,
                        kernels: List[int] or List[Tuple] = None,
                        one_d: bool = False) -> "Layer":
     """
@@ -70,18 +71,19 @@ def create_cnn_network(input_layer: "Layer",
     :param input_layer:
     :param num_of_filters:
     :param kernels:
+    :param dropout
     :param one_d: Conv1D or Conv2D
     :return:
     """
     if kernels is None:
-        kernels = [(3, 3)] * len(num_of_filters)
+        kernels = [(2, 2)] * len(num_of_filters)
 
     layer = input_layer
     for index, filter in enumerate(num_of_filters):
         layer = create_cnn_layer(input_layer=layer,
                                  num_filter=filter,
                                  kernel_size=kernels[index],
-                                 dropout=0.2,
+                                 dropout=dropout,
                                  one_d=one_d)
     layer = GlobalAvgPool2D()(layer)
     return layer

@@ -100,6 +100,8 @@ def split_and_save_data(raw_data_path,
     print(f'Started transforming raw data at {datetime.now().time()}')
     data, labels, label_to_index, feature_names = transform_raw_data(raw_data_path)
 
+    save_data(label_to_index, data_path=output_data_path, filename=label_to_index)
+
     print(f'Started creating train/test data {datetime.now().time()}')
     data_to_save, labels_to_save = create_train_valid_test_data(data=data,
                                                                 labels=labels)
@@ -119,14 +121,10 @@ def split_and_save_data(raw_data_path,
                 save_data(file=stat_comp,
                           data_path=data_path,
                           filename=f'{feature}_stat_comp')
-                # save_data(stat_comp, data_path, filename=f'{feature}_stat_comp')
 
             save_data(file=data_to_save[dir_index][feature_index],
                       data_path=data_path,
                       filename=feature)
-            # save_data(file=data_to_save[dir_index][feature_index],
-            #           data_path=data_path,
-            #           filename=feature)
 
             if data_standardization:
                 standardized_path = osp.join(data_path, 'standardized_data')
@@ -138,11 +136,6 @@ def split_and_save_data(raw_data_path,
                                                 stat_comp["max"]),
                           data_path=standardized_path,
                           filename=feature)
-                # save_data(file=standardize_data(data_to_save[dir_index][feature_index],
-                #                                 stat_comp["min"],
-                #                                 stat_comp["max"]),
-                #           data_path=standardized_path,
-                #           filename=feature)
 
             if data_normalization:
                 normalize_path = osp.join(data_path, 'normalized_data')
@@ -154,21 +147,10 @@ def split_and_save_data(raw_data_path,
                                               stat_comp["max"]),
                           data_path=normalize_path,
                           filename=feature)
-                # save_data(file=normalize_data(data_to_save[dir_index][feature_index],
-                #                               stat_comp["mean"],
-                #                               stat_comp["std"]),
-                #           data_path=normalize_path,
-                #           filename=feature)
+
             save_data(file=labels_to_save[dir_index],
                       data_path=data_path,
                       filename='labels')
-            # save_data(file=labels_to_save[dir_index],
-            #           data_path=data_path,
-            #           filename="labels")
-
-
-def prepare_new_data(data_path):
-    data, labels, label_to_index, feature_names = transform_raw_data(data_path)
 
 
 def cut_classes(data, labels, num_of_class=None, top=True, classes_to_take=None):

@@ -1,3 +1,5 @@
+hyperas==0.4.1
+hyperopt==0.1.2
 imbalanced-learn==0.4.3
 keras==2.2.4
 keras-applications==1.0.7

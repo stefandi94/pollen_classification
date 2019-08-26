@@ -18,13 +18,12 @@ class CNN(BaseDLModel):
         super().__init__(**parameters)
 
     def build_model(self) -> None:
-        inputs = [Input(input_shape) for input_shape in self.rnn_shapes.values()]
+        inputs = [Input(input_shape) for input_shape in self.shape.values()]
 
         layers = [create_cnn_network(layer, self.convolution_filters) for layer in inputs]
         layers = [Activation('relu')(Dropout(0.5)(BatchNormalization()(Dense(200)(layer)))) for layer in layers]
         layer = concatenate([layer for layer in layers])
-        # output = add([layer for layer in layers])
-        # output = Lambda(lambda x: x * 3)(output)
+
         layer = Dropout(0.5)(layer)
         output = Dense(self.num_classes, activation='softmax')(layer)
 
