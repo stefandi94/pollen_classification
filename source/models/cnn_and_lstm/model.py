@@ -1,14 +1,13 @@
 from typing import Any
 
 from keras import Input, Model
-from keras.layers import Flatten, concatenate, Dense, LSTM, Reshape, Masking, Dropout, BatchNormalization, LeakyReLU, \
-    Activation, add, Add
+from keras.layers import concatenate, Dense, LSTM, Reshape, Dropout
 
 from source.base_dl_model import BaseDLModel
 from source.models.convolutional_layers import create_cnn_network
 
 
-class RNNLSTM(BaseDLModel):
+class CNNLSTM(BaseDLModel):
     convolution_filters = [32, 64, 128]
 
     def __init__(self,

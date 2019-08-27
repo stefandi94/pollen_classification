@@ -5,6 +5,7 @@ from keras.optimizers import Adam, RMSprop
 import numpy as np
 
 from source.grid_search import data
+from source.models.cnn_and_lstm import CNNLSTM
 from split_data import cut_classes, label_mappings, save_data, create_csv
 from utils.settings import NUM_OF_CLASSES, NS_STANDARDIZED_VALID_DIR, NS_STANDARDIZED_TRAIN_DIR, \
     NS_STANDARDIZED_TEST_DIR, NS_NORMALIZED_TRAIN_DIR, NS_NORMALIZED_VALID_DIR, NS_NORMALIZED_TEST_DIR
@@ -21,8 +22,8 @@ shapes = dict(input_shape_1=(20, 120),
 
 standardized = True
 normalized = False
-NUM_OF_CLASSES = 50
-top_classes = True
+NUM_OF_CLASSES = 30
+top_classes = False
 if standardized:
     TRAIN_DIR = NS_STANDARDIZED_TRAIN_DIR
     VALID_DIR = NS_STANDARDIZED_VALID_DIR
@@ -37,8 +38,8 @@ parameters = {'epochs': 50,
               'optimizer': Adam,
               'learning_rate': 0.007,
               'num_classes': NUM_OF_CLASSES,
-              'save_dir': f'./model_weights/ns/standardized_data/lstm+cnn/adam/{NUM_OF_CLASSES}',
-              'load_dir': f'./model_weights/ns/standardized_data/lstm+cnn/adam/{NUM_OF_CLASSES}/28-2.045-0.573-1.453-0.625.hdf5'}
+              'save_dir': f'./model_weights/ns/standardized_data/down/lstm+cnn_modified/adam/{NUM_OF_CLASSES}'}
+              # 'load_dir': f'./model_weights/ns/standardized_data/lstm+cnn_modified/adam/{NUM_OF_CLASSES}/28-2.045-0.573-1.453-0.625.hdf5'}
 
 
 if __name__ == '__main__':
@@ -93,7 +94,8 @@ if __name__ == '__main__':
     #                                       trials=Trials())
 
     X_train, y_train_cate, X_valid, y_valid_cate, X_test, y_test_cate, weight_class = data(standardized=standardized,
-                                                                                           num_of_classes=NUM_OF_CLASSES)
+                                                                                           num_of_classes=NUM_OF_CLASSES,
+                                                                                           top_classes=top_classes)
 
     # print("Evaluation of best performing model:")
     # print(best_model.evaluate(X_test, y_test))
@@ -110,7 +112,7 @@ if __name__ == '__main__':
 
     smooth_labels(y_train_cate, smooth_factor)
 
-    dnn = RNNLSTM(**parameters)
+    dnn = CNNLSTM(**parameters)
     # dnn.load_model(parameters["load_dir"])
     dnn.train(X_train,
               y_train_cate,
