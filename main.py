@@ -37,7 +37,7 @@ parameters = {'epochs': 150,
               'learning_rate': 0.01,
               'num_classes': NUM_OF_CLASSES,
               'save_dir': f'./model_weights/ns/standardized_data/cnn_deep/top/Adam/{NUM_OF_CLASSES}'}
-              # 'load_dir': f'./model_weights/ns/standardized_data/lstm/rmsprop/{NUM_OF_CLASSES}/25-1.987-0.524-1.442-0.584.hdf5'}
+              # 'load_dir': f'# ./model_weights/ns/standardized_data/lstm/rmsprop/{NUM_OF_CLASSES}/25-1.987-0.524-1.442-0.584.hdf5'}
 
 
 if __name__ == '__main__':
@@ -58,41 +58,10 @@ if __name__ == '__main__':
 
     y_pred = dnn.predict(X_valid)
 
-    # X_test, y_test = load_all_data(TEST_DIR)
-    # y_test = [dict_mapping[label] for label in y_test]
-    #
-    # y_test_cate = keras.utils.to_categorical(y_test, NUM_OF_CLASSES)
-    #
-    # X_test.pop(1)
-    # X_test = X_test[:3]
-    #
-    # eval = dnn.model.evaluate(X_test, y_test_cate, batch_size=64)
-    # print(f'Accuracy is {eval[1]}')
+    eval = dnn.model.evaluate(X_test, y_test_cate, batch_size=64)
+    print(f'Accuracy is {eval[1]}')
     # plot_confidence(y_valid, y_pred)
     # plot_classes(y_valid, y_pred)
 
-    # new_x_train = flatten_data(X_train)
-    # new_x_valid = flatten_data(X_valid)
-    #
-    # print(f'Started PCA fitting at {datetime.now().time()}')
-    # pca = PCA(n_components=150)
-    # new_x_train = pca.fit_transform(new_x_train, y_train)
-    # new_x_valid = pca.transform(new_x_valid)
-    #
-    # xgb = XGBClassifier(max_depth=5,
-    #                     learning_rate=0.06,
-    #                     n_estimators=500,
-    #                     verbosity=2,
-    #                     silent=False,
-    #                     n_jobs=-1,
-    #                     nthread=1)
-    #
-    # print(f'Fitting started at {datetime.now().time()}')
-    # xgb.fit(new_x_train, y_train)
-    # print(f'Fitting finished at {datetime.now().time()}')
-    # y_pred = xgb.predict(new_x_valid)
-    #
-    # print(f'Accuracy score is {accuracy_score(y_valid, y_pred)}')
-    # print(f'Recall score is: {recall_score(y_valid, y_pred, average="macro")}')
-    # print(f'F1 score is: {f1_score(y_valid, y_pred, average="macro")}')
+
 

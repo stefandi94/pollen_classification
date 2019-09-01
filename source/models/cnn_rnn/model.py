@@ -39,3 +39,6 @@ class CNNRNN(BaseDLModel):
 
         model = Model(inputs_1, output)
         self.model = model
+
+    def __str__(self):
+        return 'CNNRNN'

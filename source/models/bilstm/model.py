@@ -20,26 +20,16 @@ class BiLSTM(BaseDLModel):
         super().__init__(**parameters)
 
     def build_model(self) -> None:
-        inputs = [Input(input_shape) for input_shape in self.rnn_shapes.values()]
-        layers = [Flatten()(layer) for layer in inputs]
-        layers = [create_dense_network(layer, num_of_neurons=self.num_of_neurons[2]) for layer in layers]
-        layers = [Reshape((int(layer.shape[1]), 1))(layer) for layer in layers]
+        inputs = [Input(input_shape) for input_shape in self.rnn_shape]
 
-        lstms = [Bidirectional(LSTM(128, return_sequences=False, recurrent_dropout=0.25, dropout=0.25))(layer) for layer
-                 in layers]
-
-        layers = [create_dense_network(layer, num_of_neurons=self.num_of_neurons[2]) for layer in lstms]
-        lay = concatenate([layer for layer in layers])
-
-        # attention = SeqSelfAttention(attention_activation='sigmoid')(lstm1)
-        # attention = Flatten()(attention)
-        # attention = Dropout(0.2)(attention)
-        # attention = BatchNormalization()(attention)
-        # attention = LeakyReLU()(attention)
-
-        attention = Dense(50)(lay)
-        attention = Dropout(0.5)(attention)
-        output = Dense(self.num_classes, activation="softmax")(attention)
+        layers = [Bidirectional(LSTM(128, recurrent_dropout=0.1, dropout=0.1)(layer)) for layer in inputs]
+        layers = [Dense(128)(layer) for layer in layers]
+        layer = concatenate([layer for layer in layers])
+        layer = Dropout(0.2)(layer)
+        output = Dense(self.num_classes, activation='softmax')(layer)
 
         model = Model(inputs, output)
         self.model = model
+
+    def __str__(self):
+        return 'BiLSTM'

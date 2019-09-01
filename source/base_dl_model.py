@@ -11,10 +11,11 @@ from keras.callbacks import ModelCheckpoint, CSVLogger
 from keras.metrics import top_k_categorical_accuracy
 from keras.utils import plot_model
 from keras_self_attention import SeqSelfAttention
-from hyperas import optim
-from hyperopt import Trials, STATUS_OK, tpe
-from hyperas.distributions import choice, uniform
+# from hyperas import optim
+# from hyperopt import Trials, STATUS_OK, tpe
+# from hyperas.distributions import choice, uniform
 
+from source.learning_rates.others import choose_lr
 from utils.settings import NUM_OF_CLASSES
 from source.learning_rates.cyclical_lr import CyclicLR
 from utils.utilites import multiple_generator
@@ -73,6 +74,7 @@ class BaseDLModel:
               y_train: np.ndarray or List[np.ndarray],
               X_valid: np.ndarray or List[np.ndarray],
               y_valid: np.ndarray or List[np.ndarray],
+              lr_type,
               weight_class: np.ndarray = None,
               generator: bool = False) -> None:
         """
@@ -99,7 +101,7 @@ class BaseDLModel:
             print(f'Model is loaded from {self.load_dir}')
 
         self.model.compile(loss=['categorical_crossentropy'],
-                           optimizer=self.optimizer(),
+                           optimizer=self.optimizer,
                            metrics=['accuracy', top_k_categorical_accuracy, self.precision, self.recall, self.f1])
 
         weights_name = "{epoch}-{loss:.3f}-{acc:.3f}-{val_loss:.3f}-{val_acc:.3f}.hdf5"
@@ -111,6 +113,8 @@ class BaseDLModel:
                 self.model.summary()
         plot_model(self.model, to_file=osp.join(self.save_dir, 'model.png'), show_shapes=True, show_layer_names=True)
 
+        lr = choose_lr(lr_type, X_train, self.batch_size, self.epochs)
+
         checkpoint = ModelCheckpoint(os.path.join(self.save_dir, weights_name),
                                      monitor='val_acc',
                                      verbose=1,
@@ -118,12 +122,8 @@ class BaseDLModel:
                                      save_best_only=True,
                                      mode='max')
 
-        clr = CyclicLR(base_lr=0.001,
-                       max_lr=0.01,
-                       mode='triangular',
-                       step_size=len(X_train[0]) // (2 * self.batch_size))
         csv_logger = CSVLogger(osp.join(self.save_dir, "model_history_log.csv"), append=True)
-        callbacks_list = [checkpoint, csv_logger, clr]
+        callbacks_list = [checkpoint, csv_logger, lr]
 
         if not generator:
             self.model.fit(X_train, y_train,

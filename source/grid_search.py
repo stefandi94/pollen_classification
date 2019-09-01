@@ -3,9 +3,6 @@ from __future__ import print_function
 import keras
 import numpy as np
 
-from hyperopt import Trials, STATUS_OK, tpe
-from hyperas.distributions import choice, uniform
-
 from source.data_reader import load_all_data, create_3d_array, create_4d_array
 from split_data import cut_classes, label_mappings, save_data
 from utils.settings import NS_STANDARDIZED_TRAIN_DIR, NS_NORMALIZED_VALID_DIR, NS_NORMALIZED_TEST_DIR, \
@@ -78,17 +75,3 @@ def data(standardized, num_of_classes, top_classes=True):
 
     return X_train, y_train_cate, X_valid, y_valid_cate, X_test, y_test_cate, weight_class
 
-
-def create_model(model, X_train, y_train, X_valid, y_valid, X_test, y_test):
-    model.compile(loss='categorical_crossentropy', metrics=['accuracy'],
-                  optimizer={{choice(['rmsprop', 'adam', 'sgd'])}})
-
-    result = model.fit(X_train, y_train,
-                       batch_size={{choice([64, 128])}},
-                       epochs=2,
-                       verbose=2,
-                       validation_data=(X_valid, y_valid))
-    # get the highest validation accuracy of the training epochs
-    validation_acc = np.amax(result.history['val_acc'])
-    print('Best validation acc of epoch:', validation_acc)
-    return {'loss': -validation_acc, 'status': STATUS_OK, 'model': model}

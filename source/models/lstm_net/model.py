@@ -25,4 +25,5 @@ class RNNLSTM(BaseDLModel):
         model = Model(inputs, output)
         self.model = model
 
-
+    def __str__(self):
+        return 'LSTM'

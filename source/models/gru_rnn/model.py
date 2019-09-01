@@ -25,4 +25,5 @@ class RNNGRU(BaseDLModel):
         model = Model(inputs_1, outputs)
         self.model = model
 
-
+    def __str__(self):
+        return 'GRU'
