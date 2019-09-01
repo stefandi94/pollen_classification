@@ -73,7 +73,7 @@ class BaseDLModel:
               y_train: np.ndarray or List[np.ndarray],
               X_valid: np.ndarray or List[np.ndarray],
               y_valid: np.ndarray or List[np.ndarray],
-              weight_class: np.ndarray,
+              weight_class: np.ndarray = None,
               generator: bool = False) -> None:
         """
         Train model given parameters
@@ -115,7 +115,7 @@ class BaseDLModel:
                                      monitor='val_acc',
                                      verbose=1,
                                      save_weights_only=False,
-                                     save_best_only=False,
+                                     save_best_only=True,
                                      mode='max')
 
         clr = CyclicLR(base_lr=0.001,

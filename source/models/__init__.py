@@ -11,3 +11,4 @@ from .mobile_net import MobileNetV2
 from .res_net import ResidualNet
 from .vgg_net import VGG
 from .wide_residual_net import WideResNet
+from .gru_rnn import RNNGRU

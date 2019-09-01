@@ -45,9 +45,10 @@ def data(standardized, num_of_classes, top_classes=True):
         if len(X_test[index]) < 3:
             X_test[index] = create_3d_array(X_test[index])
 
-    # for index in range(len(X_train)):
-    #     X_train[index] = create_4d_array(X_train[index])
-    #     X_valid[index] = create_4d_array(X_valid[index])
+    for index in range(len(X_train)):
+        X_train[index] = create_4d_array(X_train[index])
+        X_valid[index] = create_4d_array(X_valid[index])
+        X_test[index] = create_4d_array(X_test[index])
 
     X_train, y_train, classes_to_take = cut_classes(data=X_train,
                                                     labels=y_train,
