@@ -22,7 +22,7 @@ class BiLSTM(BaseDLModel):
     def build_model(self) -> None:
         inputs = [Input(input_shape) for input_shape in self.rnn_shape]
 
-        layers = [Bidirectional(LSTM(128, recurrent_dropout=0.1, dropout=0.1)(layer)) for layer in inputs]
+        layers = [Bidirectional(LSTM(128, recurrent_dropout=0.1, dropout=0.1))(layer) for layer in inputs]
         layers = [Dense(128)(layer) for layer in layers]
         layer = concatenate([layer for layer in layers])
         layer = Dropout(0.2)(layer)

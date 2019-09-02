@@ -17,10 +17,11 @@ class RNNGRU(BaseDLModel):
     def build_model(self) -> None:
         inputs_1 = [Input(input_shape) for input_shape in self.rnn_shape]
 
-        layers_1 = [GRU(512, recurrent_dropout=0.0, dropout=0.0)(layer) for layer in inputs_1]
-        layers_1 = concatenate([layer for layer in layers_1])
+        layers = [GRU(256, recurrent_dropout=0.1, dropout=0.1)(layer) for layer in inputs_1]
+        layers = [Dense(128)(layer) for layer in layers]
+        layers = concatenate([layer for layer in layers])
 
-        layers = Dropout(0.2)(layers_1)
+        layers = Dropout(0.2)(layers)
         outputs = Dense(self.num_classes, activation='softmax')(layers)
         model = Model(inputs_1, outputs)
         self.model = model

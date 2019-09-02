@@ -128,7 +128,7 @@ class BaseDLModel:
         if not generator:
             self.model.fit(X_train, y_train,
                            validation_data=(X_valid, y_valid),
-                           verbose=1,
+                           verbose=2,
                            epochs=self.epochs,
                            batch_size=self.batch_size,
                            callbacks=callbacks_list,

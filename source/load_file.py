@@ -17,4 +17,5 @@ def get_model(model_name):
         model = CNNRNN
     elif model_name == 'CNNLSTM':
         model = CNNLSTM
+
     return model

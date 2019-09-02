@@ -1,4 +1,5 @@
 import itertools
+import os
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -139,11 +140,11 @@ def plot_pred(report):
     plt.close()
 
 
-def plot_confidence(y_true, y_pred):
+def plot_confidence(y_true, y_pred, path, num_classes):
     true_conf = []
     false_conf = []
-    true_dicti = dict((k, []) for k in range(50))
-    false_dicti = dict((k, []) for k in range(50))
+    true_dicti = dict((k, []) for k in range(num_classes))
+    false_dicti = dict((k, []) for k in range(num_classes))
 
     for idx, (pred, conf) in enumerate(y_pred):
         if pred == y_true[idx]:
@@ -163,7 +164,7 @@ def plot_confidence(y_true, y_pred):
     ax.bar(bins[1:] + 0.0325, false_pred, width=0.015, color='b', align='center')
     ax.bar(bins[1:] - 0.0325, true_pred, width=0.015, color='r', align='center')
     plt.legend(legend, loc='best')
-    plt.savefig('./conf.png')
+    plt.savefig(os.path.join(path,'conf.png'))
     plt.show()
 
     return true_dicti, false_dicti
@@ -210,22 +211,22 @@ def plot_tr(epoch_list, all_train_losses, all_validation_losses):
     plt.show()
 
 
-def plot_classes(y_true, y_pred):
+def plot_classes(y_true, y_pred, path, num_of_classes):
     class_pred = [clas[0] for clas in y_pred]
     pred_dict = count_values(class_pred)
     true_dict = count_values(y_true)
 
-    for i in range(NUM_OF_CLASSES):
+    for i in range(num_of_classes):
         if i not in pred_dict.keys():
             pred_dict[i] = 0
 
     legend = ['predicted', 'true']
     plt.figure(figsize=(15, 10))
-    plt.bar(np.arange(-0.2, NUM_OF_CLASSES - 1, 1), list(pred_dict.values()), width=0.3, align='center', color='r')
-    plt.bar(np.arange(0.2, NUM_OF_CLASSES, 1), list(true_dict.values()), width=0.3, align='center', color='b')
+    plt.bar(np.arange(-0.2, num_of_classes - 1, 1), list(pred_dict.values()), width=0.3, align='center', color='r')
+    plt.bar(np.arange(0.2, num_of_classes, 1), list(true_dict.values()), width=0.3, align='center', color='b')
     plt.xticks(range(len(true_dict)), list(true_dict.keys()))
     plt.legend(legend, loc='best')
-    plt.savefig('./classes.png')
+    plt.savefig(os.path.join(path, 'classes.png'))
     plt.show()
 
 

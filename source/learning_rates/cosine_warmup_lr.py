@@ -114,13 +114,3 @@ class WarmUpCosineDecayScheduler(keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         print(K.eval(self.model.optimizer.lr))
-        print(f'Current learning rate: {self.current_lr}')
-
-# total_steps = int(self.epochs * X_train[0].shape[0] / self.batch_size)
-# warmup_steps = int(args.warmup_epoch * X_train[0].shape[0] / self.batch_size)
-#
-# warm_up_lr = WarmUpCosineDecayScheduler(learning_rate_base=args.learning_rate,
-#                                         total_steps=total_steps,
-#                                         warmup_learning_rate=args.warmup_learning_rate,
-#                                         warmup_steps=warmup_steps,
-#                                         hold_base_rate_steps=args.hold_base_rate)

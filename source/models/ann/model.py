@@ -12,7 +12,7 @@ bias_init = keras.initializers.Constant(value=0.2)
 
 
 class ANN(BaseDLModel):
-    num_of_neurons = [600, 400, 200]
+    num_of_neurons = [1000, 600, 400, 200]
 
     def __init__(self,
                  **parameters: Any) -> None:
@@ -25,7 +25,7 @@ class ANN(BaseDLModel):
         layers = [Flatten()(layer) for layer in layers]
         layer = concatenate([layer for layer in layers])
 
-        flatten = Dropout(0.5)(layer)
+        flatten = Dropout(0.3)(layer)
         output = Dense(self.num_classes, activation='softmax')(flatten)
 
         model = Model(inputs, output)

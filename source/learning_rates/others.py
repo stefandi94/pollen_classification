@@ -28,13 +28,13 @@ def choose_lr(type, X_train, batch_size, epochs):
 
     if type == 'cyclic':
         rate = CyclicLR(base_lr=0.001,
-                       max_lr=0.01,
-                       mode='triangular',
-                       step_size=len(X_train[0]) // (2 * batch_size))
+                        max_lr=0.01,
+                        mode='triangular',
+                        step_size=len(X_train[0]) // (2 * batch_size))
 
     elif type == 'cosine':
         learning_rate_base = 0.001
-        warmup_epoch = 5
+        warmup_epoch = int(epochs * 0.2)
         total_steps = int(epochs * len(X_train[0]) / batch_size)
         warmup_steps = int(warmup_epoch * len(X_train[0]) / batch_size)
 

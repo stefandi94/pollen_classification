@@ -42,10 +42,10 @@ def data(standardized, num_of_classes, top_classes=True):
         if len(X_test[index]) < 3:
             X_test[index] = create_3d_array(X_test[index])
 
-    for index in range(len(X_train)):
-        X_train[index] = create_4d_array(X_train[index])
-        X_valid[index] = create_4d_array(X_valid[index])
-        X_test[index] = create_4d_array(X_test[index])
+    # for index in range(len(X_train)):
+    #     X_train[index] = create_4d_array(X_train[index])
+    #     X_valid[index] = create_4d_array(X_valid[index])
+    #     X_test[index] = create_4d_array(X_test[index])
 
     X_train, y_train, classes_to_take = cut_classes(data=X_train,
                                                     labels=y_train,
@@ -69,9 +69,5 @@ def data(standardized, num_of_classes, top_classes=True):
 
     weight_class = calculate_weights(y_train)
 
-    y_train_cate = keras.utils.to_categorical(y_train, num_of_classes)
-    y_valid_cate = keras.utils.to_categorical(y_valid, num_of_classes)
-    y_test_cate = keras.utils.to_categorical(y_test, num_of_classes)
-
-    return X_train, y_train_cate, X_valid, y_valid_cate, X_test, y_test_cate, weight_class
+    return X_train, y_train, X_valid, y_valid, X_test, y_test, weight_class
 
