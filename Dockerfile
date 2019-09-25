@@ -7,7 +7,7 @@ WORKDIR /home/stefan/docker_project/
 COPY source /home/stefan/docker_project/
 COPY requirements.txt /home/stefan/docker_project/
 COPY utils /home/stefan/docker_project/
-COPY utils/settings.py /home/stefan/docker_project/
+COPY settings.py /home/stefan/docker_project/
 COPY main.py /home/stefan/docker_project/
 
 RUN pip install -r requirements.txt

@@ -5,7 +5,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from utils.settings import NUM_OF_CLASSES
 from utils.utilites import count_values
 
 
@@ -219,6 +218,9 @@ def plot_classes(y_true, y_pred, path, num_of_classes):
     for i in range(num_of_classes):
         if i not in pred_dict.keys():
             pred_dict[i] = 0
+
+        if i not in true_dict.keys():
+            true_dict[i] = 0
 
     legend = ['predicted', 'true']
     plt.figure(figsize=(15, 10))

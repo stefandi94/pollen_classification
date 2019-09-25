@@ -16,8 +16,7 @@ from keras_self_attention import SeqSelfAttention
 # from hyperas.distributions import choice, uniform
 
 from source.learning_rates.others import choose_lr
-from utils.settings import NUM_OF_CLASSES
-from source.learning_rates.cyclical_lr import CyclicLR
+from settings import NUM_OF_CLASSES
 from utils.utilites import multiple_generator
 
 

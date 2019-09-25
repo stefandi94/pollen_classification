@@ -1,16 +1,11 @@
-import keras
-from keras.optimizers import Adam, RMSprop
-import numpy as np
+from keras.utils import to_categorical
 
-from source.grid_search import data
-from source.models.cnn_and_lstm import CNNLSTM
-from split_data import cut_classes, label_mappings, save_data, create_csv
-from utils.settings import NUM_OF_CLASSES, NS_STANDARDIZED_VALID_DIR, NS_STANDARDIZED_TRAIN_DIR, \
+from source.data_loader import data
+from settings import NS_STANDARDIZED_VALID_DIR, NS_STANDARDIZED_TRAIN_DIR, \
     NS_STANDARDIZED_TEST_DIR, NS_NORMALIZED_TRAIN_DIR, NS_NORMALIZED_VALID_DIR, NS_NORMALIZED_TEST_DIR
-from source.data_reader import load_all_data, create_3d_array, create_4d_array
-from source.models import CNN, RNNLSTM, ANN, CNNRNN, RNNGRU, BiLSTM
+from source.models import BiLSTM
 from source.plotting_predictions import plot_confidence, plot_classes
-from utils.utilites import calculate_weights, smooth_labels, count_values
+from utils.utilites import smooth_labels
 
 smooth_factor = 0.1
 shapes = dict(input_shape_1=(20, 120),
@@ -44,9 +39,9 @@ if __name__ == '__main__':
                                                                             num_of_classes=NUM_OF_CLASSES,
                                                                             top_classes=top_classes)
 
-    y_train_cate = keras.utils.to_categorical(y_train, NUM_OF_CLASSES)
-    y_valid_cate = keras.utils.to_categorical(y_valid, NUM_OF_CLASSES)
-    y_test_cate = keras.utils.to_categorical(y_test, NUM_OF_CLASSES)
+    y_train_cate = to_categorical(y_train, NUM_OF_CLASSES)
+    y_valid_cate = to_categorical(y_valid, NUM_OF_CLASSES)
+    y_test_cate = to_categorical(y_test, NUM_OF_CLASSES)
 
     smooth_labels(y_train_cate, smooth_factor)
 

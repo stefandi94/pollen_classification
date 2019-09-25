@@ -45,7 +45,9 @@ NS_STANDARDIZED_VALID_DIR = osp.join(NS_VALID_DIR, 'standardized_data')
 NS_NORMALIZED_TEST_DIR = osp.join(NS_TEST_DIR, 'normalized_data')
 NS_STANDARDIZED_TEST_DIR = osp.join(NS_TEST_DIR, 'standardized_data')
 
+WEIGHTS_DIR = '/mnt/hdd/pollen_data/weights'
 # MODEL_DIR
+
 MODEL_DIR = osp.join(BASE_DIR, 'model_weights')
 
 ########################################################################################################################

@@ -36,7 +36,7 @@ def transform_raw_data(raw_data_path):
     #          "label_to_index": class_to_num,
     #          "feature_names": feature_names}
     # return files
-    return data, labels, label_to_index, feature_names
+    return data, labels, class_to_num, feature_names
 
 
 def create_lifetime(data, path_to_save):

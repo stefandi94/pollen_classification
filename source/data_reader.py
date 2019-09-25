@@ -4,7 +4,7 @@ from typing import List, Tuple
 import numpy as np
 import os.path as osp
 
-from utils.settings import NS_TRAIN_DIR, NS_VALID_DIR, NS_TEST_DIR
+from settings import NS_TRAIN_DIR, NS_VALID_DIR, NS_TEST_DIR
 from split_data import load_data
 
 

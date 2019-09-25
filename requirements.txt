@@ -1,3 +1,4 @@
+glob2==0.7
 hyperas==0.4.1
 hyperopt==0.1.2
 imbalanced-learn==0.4.3
