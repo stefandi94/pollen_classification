@@ -5,7 +5,7 @@ import numpy as np
 import os.path as osp
 
 from settings import NS_TRAIN_DIR, NS_VALID_DIR, NS_TEST_DIR
-from split_data import load_data
+from utils.split_data import load_data
 
 
 def create_3_channels(array: np.ndarray) -> np.ndarray:

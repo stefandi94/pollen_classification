@@ -1,5 +1,5 @@
 from source.data_reader import load_all_data, create_3d_array
-from split_data import cut_classes, label_mappings
+from utils.split_data import cut_classes, label_mappings
 from settings import NS_STANDARDIZED_TRAIN_DIR, NS_NORMALIZED_VALID_DIR, NS_NORMALIZED_TEST_DIR, \
     NS_NORMALIZED_TRAIN_DIR, NS_STANDARDIZED_TEST_DIR, NS_STANDARDIZED_VALID_DIR, OS_NORMALIZED_TEST_DIR, \
     OS_NORMALIZED_VALID_DIR, OS_NORMALIZED_TRAIN_DIR, OS_STANDARDIZED_TEST_DIR, OS_STANDARDIZED_VALID_DIR, \

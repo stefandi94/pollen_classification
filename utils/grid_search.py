@@ -1,4 +1,3 @@
-import glob
 import os.path as osp
 
 import glob2
@@ -9,7 +8,7 @@ from settings import WEIGHTS_DIR
 from source.data_loader import data
 from source.load_file import get_model
 from source.plotting_predictions import plot_confidence, plot_classes
-from split_data import save_data
+from utils.split_data import save_data
 from utils.utilites import smooth_labels
 
 
@@ -48,7 +47,9 @@ def search():
                                 print('Stared new fitting')
                                 save_dir = f'/mnt/hdd/pollen_data/model_weights/os/data_type_{data_type}/' \
                                            f'/smooth_factor_{smooth_factor}' \
-                                           f'/optimizer_{optimizer}/learning_rate_type{lr_type}/model_name_{model_name}'
+                                           f'/optimizer_{optimizer}' \
+                                           f'/learning_rate_type_{lr_type}/' \
+                                           f'model_name_{model_name}'
                                 save_data(dict_mapping, data_path=save_dir, filename='mapping')
 
                                 # save_dir = f'/mnt/hdd/pollen_data/model_weights/os/{data_type}/{model_name}/' \
@@ -87,16 +88,35 @@ def search():
     return best_parameters, acc
 
 
-def find_top_acc(num_of_top_results, weights_dir=WEIGHTS_DIR):
-    all_header_files = glob.glob(osp.join(weights_dir, '/**/*.hdf5'), recursive=True)
+def find_val_acc():
+    weights_dir = WEIGHTS_DIR
+    file_paths = glob2.glob(osp.join(weights_dir, '**/*.hdf5'))
 
-    top_files_index = []
     val_acc = []
-    for index, file in all_header_files:
-        val_acc.append(float(file.split("/")[-1][-10:-5]))
+    file_names = []
+    for index, file in enumerate(file_paths):
+        split_file = file.split("/")
+        acc = split_file[-1][-10:-5]
+        if file not in file_names:
+            file_names.append(file)
+            val_acc.append(float(acc))
+
+    return val_acc, file_names
+
+
+def fin_top_acc(val_acc, file_names, top_acc):
     val_acc = np.array(val_acc)
+    file_names = np.array(file_names)
+
+    indices = val_acc.argsort()
+    top_val_acc = val_acc[indices[-top_acc:]]
+    top_names_acc = file_names[indices[-top_acc:]]
+
+    return top_val_acc, top_names_acc
 
 
 if __name__ == '__main__':
     # best_acc = search()
-    find_top_acc(10)
+    val_acc, file_names = find_val_acc()
+    top_val_acc, top_names_acc = fin_top_acc(val_acc, file_names, 100)
+    print()

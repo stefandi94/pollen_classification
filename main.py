@@ -16,6 +16,7 @@ standardized = True
 normalized = False
 NUM_OF_CLASSES = 50
 top_classes = True
+
 if standardized:
     TRAIN_DIR = NS_STANDARDIZED_TRAIN_DIR
     VALID_DIR = NS_STANDARDIZED_VALID_DIR
@@ -29,8 +30,10 @@ parameters = {'epochs': 1,
               'batch_size': 64,
               'optimizer': 'adam',
               'num_classes': NUM_OF_CLASSES,
-              'save_dir': f'./model_weights/ns/standardized_data/cnn_deep/top/Adam/{NUM_OF_CLASSES}',
-              'load_dir': f'./model_weights/ns/standardized_data/cnn_deep/top/Adam/50/5-2.672-0.350-2.307-0.377.hdf5'}
+              'save_dir': './test'}
+
+              # 'save_dir': f'./model_weights/ns/standardized_data/cnn_deep/top/Adam/{NUM_OF_CLASSES}'},
+              # 'load_dir': f'./model_weights/ns/standardized_data/cnn_deep/top/Adam/50/5-2.672-0.350-2.307-0.377.hdf5'}
 
 
 if __name__ == '__main__':

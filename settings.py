@@ -9,7 +9,7 @@ NUM_OF_CLASSES = 50
 # BASE DIRECTORY
 BASE_DIR = osp.dirname(osp.realpath(__file__))
 
-DATA_DIR = '/mnt/hdd/pollen_data/'
+DATA_DIR = osp.join(BASE_DIR, 'data')
 
 RAW_DATA_DIR = osp.join(DATA_DIR, 'raw')
 OS_RAW_DATA_DIR = osp.join(RAW_DATA_DIR, 'OS')
@@ -45,7 +45,7 @@ NS_STANDARDIZED_VALID_DIR = osp.join(NS_VALID_DIR, 'standardized_data')
 NS_NORMALIZED_TEST_DIR = osp.join(NS_TEST_DIR, 'normalized_data')
 NS_STANDARDIZED_TEST_DIR = osp.join(NS_TEST_DIR, 'standardized_data')
 
-WEIGHTS_DIR = '/mnt/hdd/pollen_data/weights'
+WEIGHTS_DIR = osp.join(BASE_DIR, 'model_weights')
 # MODEL_DIR
 
 MODEL_DIR = osp.join(BASE_DIR, 'model_weights')
