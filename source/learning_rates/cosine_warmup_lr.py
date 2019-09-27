@@ -112,5 +112,5 @@ class WarmUpCosineDecayScheduler(keras.callbacks.Callback):
             print('\nBatch %05d: setting learning '
                   'rate to %s.' % (self.global_step + 1, lr))
 
-    def on_epoch_end(self, epoch, logs=None):
-        print(K.eval(self.model.optimizer.lr))
+    # def on_epoch_end(self, epoch, logs=None):
+    #     print(K.eval(self.model.optimizer.lr))

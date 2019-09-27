@@ -110,7 +110,7 @@ class BaseDLModel:
         with open(osp.join(self.save_dir, 'model_summary.txt'), 'w') as f:
             with redirect_stdout(f):
                 self.model.summary()
-        plot_model(self.model, to_file=osp.join(self.save_dir, 'model.png'), show_shapes=True, show_layer_names=True)
+        # plot_model(self.model, to_file=osp.join(self.save_dir, 'model.png'), show_shapes=True, show_layer_names=True)
 
         lr = choose_lr(lr_type, X_train, self.batch_size, self.epochs)
 

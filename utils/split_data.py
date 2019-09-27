@@ -1,6 +1,7 @@
 import operator
 import os
 import os.path as osp
+import pickle
 from datetime import datetime
 
 import numpy as np
@@ -21,11 +22,8 @@ def load_data(data_path, filename):
 
 
 def save_data(file, data_path, filename):
-    try:
-        os.makedirs(data_path)
-    except FileExistsError:
-        pass
-    np.save(osp.join(data_path, f'{filename}.npy'), file)
+    os.makedirs(data_path, exist_ok=True)
+    np.save(file, osp.join(data_path, f'{filename}.npy'))
     # with open(osp.join(data_path, f'{filename}.pckl'), 'wb') as handle:
     #     pickle.dump(file, handle, protocol=pickle.HIGHEST_PROTOCOL)
 

@@ -1,145 +1,93 @@
-import itertools
 import os
 
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+import pandas as pd
+from sklearn.metrics import confusion_matrix
+from sklearn.utils.multiclass import unique_labels
 
-from utils.utilites import count_values
+from utils.utilites import count_values, smooth_curve
 
 
-def show_values(pc, fmt="%.2f", **kw):
+# def plot_confusion_matrix(confusion_matrix, classes, path, show_plot):
+#     df_cm = pd.DataFrame(confusion_matrix, index=[i for i in classes], columns=[i for i in classes])
+#     plt.figure(figsize=(20, 15))
+#     sns.heatmap(df_cm, annot=True)
+#     plt.savefig(os.path.join(path, 'conf_matrix.png'))
+#
+#     if show_plot:
+#         plt.show()
+def plot_confusion_matrix(y_true, y_pred,
+                          classes, path,
+                          normalize=False,
+                          title=None,
+                          cmap=plt.cm.Blues,
+                          show_plot=False):
     """
-    Heatmap with text in each cell with matplotlib's pyplot
-    Source: https://stackoverflow.com/a/25074150/395857
-    By HYRY
-    """
-    from itertools import zip_longest as zip
-    pc.update_scalarmappable()
-    ax = pc.axes
-    for p, color, value in zip(pc.get_paths(), pc.get_facecolors(), pc.get_array()):
-        x, y = p.vertices[:-2, :].mean(0)
-        if np.all(color[:3] > 0.5):
-            color = (0.0, 0.0, 0.0)
-        else:
-            color = (1.0, 1.0, 1.0)
-        ax.text(x, y, fmt % value, ha="center", va="center", color=color, **kw)
-
-
-def cm2inch(*tupl):
-    """
-   Specify figure size in centimeter in matplotlib
-    Source: https://stackoverflow.com/a/22787457/395857
-    By gns-ank
-    """
-    inch = 2.54
-    if type(tupl[0]) == tuple:
-        return tuple(i / inch for i in tupl[0])
-    else:
-        return tuple(i / inch for i in tupl)
-
-
-def heatmap(AUC, title, xlabel, ylabel, xticklabels, yticklabels, figure_width=40, figure_height=20,
-            correct_orientation=False, cmap='RdBu'):
-    """
-    Inspired by:
-    - https://stackoverflow.com/a/16124677/395857
-    - https://stackoverflow.com/a/25074150/395857
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
     """
 
-    # Plot it out
-    fig, ax = plt.subplots()
-    # c = ax.pcolor(AUC, edgecolors='k', linestyle= 'dashed', linewidths=0.2, cmap='RdBu', vmin=0.0, vmax=1.0)
-    c = ax.pcolor(AUC, edgecolors='k', linestyle='dashed', linewidths=0.2, cmap=cmap)
+    # Compute confusion matrix
+    cm = confusion_matrix(y_true, y_pred)
+    # Only use the labels that appear in the data
+    classes = classes[unique_labels(y_true, y_pred)]
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
-    # put the major ticks at the middle of each cell
-    ax.set_yticks(np.arange(AUC.shape[0]) + 0.5, minor=False)
-    ax.set_xticks(np.arange(AUC.shape[1]) + 0.5, minor=False)
+    print(cm)
 
-    # set tick labels
-    # ax.set_xticklabels(np.arange(1,AUC.shape[1]+1), minor=False)
-    ax.set_xticklabels(xticklabels, minor=False)
-    ax.set_yticklabels(yticklabels, minor=False)
+    fig, ax = plt.subplots(figsize=(20, 15))
+    im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
+    ax.figure.colorbar(im, ax=ax)
+    # We want to show all ticks...
+    ax.set(xticks=np.arange(cm.shape[1]),
+           yticks=np.arange(cm.shape[0]),
+           # ... and label them with the respective list entries
+           xticklabels=classes,
+           yticklabels=classes,
+           title=title,
+           ylabel='True label',
+           xlabel='Predicted label')
 
-    # set title and x/y labels
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+             rotation_mode="anchor")
 
-    # Remove last blank column
-    plt.xlim((0, AUC.shape[1]))
+    # Loop over data dimensions and create text annotations.
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, format(cm[i, j], fmt),
+                    ha="center", va="center",
+                    color="white" if cm[i, j] > thresh else "black")
+    fig.tight_layout()
+    plt.savefig(os.path.join(path, 'conf_matrix.png'))
 
-    # Turn off all the ticks
-    ax = plt.gca()
-    for t in ax.xaxis.get_major_ticks():
-        t.tick1On = False
-        t.tick2On = False
-    for t in ax.yaxis.get_major_ticks():
-        t.tick1On = False
-        t.tick2On = False
-
-    # Add color bar
-    plt.colorbar(c)
-
-    # Add text in each cell
-    show_values(c)
-
-    # Proper orientation (origin at the top left instead of bottom left)
-    if correct_orientation:
-        ax.invert_yaxis()
-        ax.xaxis.tick_top()
-
-    # resize
-    fig = plt.gcf()
-    # fig.set_size_inches(cm2inch(40, 20))
-    # fig.set_size_inches(cm2inch(40*4, 20*4))
-    fig.set_size_inches(cm2inch(figure_width, figure_height))
+    if show_plot:
+        plt.show()
+    return ax
 
 
-def plot_classification_report(classification_report, title='Classification report ', cmap='RdBu'):
-    """
-    Plot scikit-learn classification report.
-    Extension based on https://stackoverflow.com/a/31689645/395857
-    """
-    lines = classification_report.split('\n')
+# np.set_printoptions(precision=2)
 
-    classes = []
-    plotMat = []
-    support = []
-    class_names = []
-    for line in lines[2: (len(lines) - 3)]:
-        t = line.strip().split()
-        if len(t) < 2:
-            continue
-        classes.append(t[0])
-        v = [float(x) for x in t[1: len(t) - 1]]
-        support.append(int(t[-1]))
-        class_names.append(t[0])
-        print(v)
-        plotMat.append(v)
+# Plot non-normalized confusion matrix
+# plot_confusion_matrix(y_test, y_pred, classes=class_names,
+#                       title='Confusion matrix, without normalization')
 
-    print('plotMat: {0}'.format(plotMat))
-    print('support: {0}'.format(support))
-
-    xlabel = 'Metrics'
-    ylabel = 'Classes'
-    xticklabels = ['Precision', 'Recall', 'F1-score']
-    yticklabels = ['{0} ({1})'.format(class_names[idx], sup) for idx, sup in enumerate(support)]
-    figure_width = 25
-    figure_height = len(class_names) + 7
-    correct_orientation = False
-    heatmap(np.array(plotMat), title, xlabel, ylabel, xticklabels, yticklabels, figure_width, figure_height,
-            correct_orientation, cmap=cmap)
+# Plot normalized confusion matrix
+# plot_confusion_matrix(y_test, y_pred, classes=class_names, normalize=True,
+#                       title='Normalized confusion matrix')
+#
+# plt.show()
 
 
-def plot_pred(report):
-    sampleClassificationReport = report
-    plot_classification_report(sampleClassificationReport)
-    plt.savefig('test_plot_classif_report.png', dpi=200, format='png', bbox_inches='tight')
-    plt.close()
+# TODO: create function which will read history log and plot accuracy and loss over time
 
 
-def plot_confidence(y_true, y_pred, path, num_classes):
+def create_dict_conf(y_true, y_pred, num_classes):
     true_conf = []
     false_conf = []
     true_dicti = dict((k, []) for k in range(num_classes))
@@ -153,64 +101,33 @@ def plot_confidence(y_true, y_pred, path, num_classes):
             false_conf.append(conf)
             false_dicti[pred].append(conf)
 
-    print(f'Confidence for true prediction is {np.mean(y_true)}, and for false prediction is {np.mean(y_pred)}')
+    return true_conf, true_dicti, false_conf, false_dicti
+
+
+def plot_confidence(true_conf, false_conf, path, show_plot):
+    plt.clf()
+
     bins = np.arange(0, 1, 0.05)
     false_pred, _ = np.histogram(false_conf, bins)
     true_pred, _ = np.histogram(true_conf, bins)
 
     legend = ['misses', 'hits']
+    plt.figure(figsize=(20, 15))
     ax = plt.subplot(111)
     ax.bar(bins[1:] + 0.0325, false_pred, width=0.015, color='b', align='center')
     ax.bar(bins[1:] - 0.0325, true_pred, width=0.015, color='r', align='center')
+
     plt.legend(legend, loc='best')
-    plt.savefig(os.path.join(path,'conf.png'))
-    plt.show()
+    plt.title('Confidence of hits and misses')
+    plt.savefig(os.path.join(path, 'conf.png'))
 
-    return true_dicti, false_dicti
-
-
-def confusion_matrix(save, cm, classes, normalize, klasa, title='Confusion matrix', cmap=plt.cm.Blues):
-    if normalize:
-        cm = cm.astype('float32') / cm.sum(axis=1)[:, np.newaxis]
-
-    plt.figure(figsize=((30, 30)))
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45, fontsize=20)
-    plt.yticks(tick_marks, classes, fontsize=20)
-
-    fmt = '.2f' if normalize else 'd'
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-
-    matplotlib.rcParams.update({'font.size': 20})
-    plt.tight_layout()
-    plt.ylabel('True label', fontsize=20)
-    plt.xlabel('Predicted label', fontsize=20)
-    if save:
-        plt.savefig('/home/pedjamat/Documents/models/cm/' + str(klasa) + '.png')
-    else:
+    if show_plot:
         plt.show()
 
 
-def plot_tr(epoch_list, all_train_losses, all_validation_losses):
-    plt.figure(figsize=(10, 8))
-    plt.plot(epoch_list, all_train_losses)
-    plt.plot(epoch_list, all_validation_losses)
-    plt.xlabel("Epoch number")
-    plt.ylabel("Cost")
-    plt.legend(["Train", "Validation"], fontsize=20)
-    matplotlib.rcParams.update({'font.size': 20})
-    # plt.savefig('/home/pedjamat/Pictures/overfitting.png')
-    plt.show()
+def plot_classes(y_true, y_pred, path, num_of_classes, show_plot):
+    plt.clf()
 
-
-def plot_classes(y_true, y_pred, path, num_of_classes):
     class_pred = [clas[0] for clas in y_pred]
     pred_dict = count_values(class_pred)
     true_dict = count_values(y_true)
@@ -223,25 +140,81 @@ def plot_classes(y_true, y_pred, path, num_of_classes):
             true_dict[i] = 0
 
     legend = ['predicted', 'true']
-    plt.figure(figsize=(15, 10))
+    plt.figure(figsize=(20, 15))
     plt.bar(np.arange(-0.2, num_of_classes - 1, 1), list(pred_dict.values()), width=0.3, align='center', color='r')
     plt.bar(np.arange(0.2, num_of_classes, 1), list(true_dict.values()), width=0.3, align='center', color='b')
+
     plt.xticks(range(len(true_dict)), list(true_dict.keys()))
     plt.legend(legend, loc='best')
+    plt.title('Number of true and predicted class')
     plt.savefig(os.path.join(path, 'classes.png'))
-    plt.show()
+
+    if show_plot:
+        plt.show()
 
 
-def plot_confidence_per_class(true_conf_dict, false_conf_dict, num_class):
+def plot_confidence_per_class(true_dicti, false_dicti, num_of_classes, path, show_plot):
+    plt.clf()
+
     bins = np.arange(0, 1, 0.05)
-    true_classes_conf, _ = np.histogram(true_conf_dict[num_class], bins)
-    false_conf_dict, _ = np.histogram(false_conf_dict[num_class], bins)
+    # uzeti sve klase koje su postoje u true conf i onda naci sve, uzeti mean i plotovati
+    mean_true_conf = dict()
+    for key in true_dicti:
+        mean_true_conf[key] = np.mean(true_dicti[key])
 
-    legend = ['predicted', 'true']
-    plt.figure(figsize=(15, 10))
-    ax = plt.subplot(111)
-    ax.bar(bins[1:] + 0.0325, true_classes_conf, width=0.015, color='b', align='center')
-    ax.bar(bins[1:] - 0.0325, false_conf_dict, width=0.015, color='r', align='center')
+    mean_false_conf = dict()
+    for key in true_dicti:
+        mean_false_conf[key] = np.mean(false_dicti[key])
+
+    legend = ['true_confidence', 'false_confidence']
+    plt.figure(figsize=(20, 15))
+    plt.bar(np.arange(-0.2, num_of_classes - 1, 1), list(mean_true_conf.values()), width=0.3, align='center', color='r')
+    plt.bar(np.arange(0.2, num_of_classes, 1), list(mean_false_conf.values()), width=0.3, align='center', color='b')
+
+    plt.xticks(range(len(mean_true_conf)), list(mean_false_conf.keys()))
+    plt.title('Confidence per class')
     plt.legend(legend, loc='best')
-    plt.savefig(f'./conf_class_{num_class}.png')
-    plt.show()
+    plt.savefig(os.path.join(path, 'confidence_per_class.png'))
+
+    if show_plot:
+        plt.show()
+
+
+def plot_history(log_path, smooth=False, factor=0.8, show_plot=False):
+    plt.clf()
+    data = pd.read_csv(os.path.join(log_path, 'model_history_log.csv'))
+
+    plt.clf()
+    plt.figure(figsize=(20, 15))
+    epochs = range(1, len(data['epochs']))
+
+    acc = data['acc']
+    val_acc = data['val_acc']
+    loss = data['loss']
+    val_loss = data['val_loss']
+
+    if smooth:
+        acc = smooth_curve(acc, factor=factor)
+        val_acc = smooth_curve(val_acc, factor=factor)
+        loss = smooth_curve(loss, factor=factor)
+        val_loss = smooth_curve(val_loss, factor=factor)
+
+    plt.plot(epochs, acc, 'bo', label='Training acc')
+    plt.plot(epochs, val_acc, 'b', label='Validation acc')
+    plt.title('Training and validation accuracy')
+    plt.legend()
+
+    plt.savefig(os.path.join(log_path, 'train_valid_acc.png'))
+
+    if show_plot:
+        plt.show()
+
+    plt.figure()
+    plt.plot(epochs, loss, 'bo', label='Training loss')
+    plt.plot(epochs, val_loss, 'b', label='Validation loss')
+    plt.title('Training and validation loss')
+    plt.legend()
+    plt.savefig(os.path.join(log_path, 'train_valid_loss.png'))
+
+    if show_plot:
+        plt.show()

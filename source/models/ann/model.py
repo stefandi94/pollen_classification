@@ -12,7 +12,7 @@ bias_init = keras.initializers.Constant(value=0.2)
 
 
 class ANN(BaseDLModel):
-    num_of_neurons = [1000, 600, 400, 200]
+    num_of_neurons = [400, 300, 100]
 
     def __init__(self,
                  **parameters: Any) -> None:
