@@ -186,7 +186,7 @@ def plot_history(log_path, smooth=False, factor=0.8, show_plot=False):
 
     plt.clf()
     plt.figure(figsize=(20, 15))
-    epochs = range(1, len(data['epochs']))
+    epochs = range(1, len(data['epoch']) + 1)
 
     acc = data['acc']
     val_acc = data['val_acc']

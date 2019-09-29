@@ -9,7 +9,7 @@ from source.models.dense_layers.dense_layers import create_dense_network
 
 
 class CNN(BaseDLModel):
-    convolution_filters = [32, 64, 64, 64]
+    convolution_filters = [32, 64, 64, 128]
 
     def __init__(self,
                  **parameters: Any) -> None:

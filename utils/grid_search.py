@@ -18,14 +18,15 @@ def search():
     best_parameters = {}
     acc = 0
     epochs = 10
-    batch_size = 256
-    grid = {'data_type': ['standardized'],  # standardized, normalized is done for OS RNN
-            'num_of_classes': [8],
-            'smooth_factor': [0.0, 0.1],
+    batch_size = 128
+    grid = {'data_type': ['standardized', 'normalized'],  # standardized, normalized is done for OS RNN
+            'num_of_classes': [30],  # num_classes - 10, smooth-factor - 0, normalized
+            'smooth_factor': [0.1],  # 0
             'optimizer': ['adam', 'rmsprop'],
             'learning_rate': ['cosine', 'cyclic'],
-            'models': ['ANN', 'LSTM', 'GRU', 'BiLSTM']}
-    # 'models': ['ANN', 'CNN', 'CNNRNN' 'RNNLSTM', 'GRU', 'BiLSTM', 'CNNLSTM']}
+            'models': ['CNNLSTM', 'ANN', "GRU", 'BiLSTM', 'LSTM']}
+    # 'models': ['ANN', 'CNN', 'CNNRNN'', 'GRU', 'BiLSTM', 'CNNLSTM']}
+    # Finished models: ANN, LSTM, GRU, BiLSTM, CNN, on training: CNN
 
     for data_type in grid['data_type']:
         # for class_type in grid['class_types']:
@@ -33,7 +34,7 @@ def search():
             X_train, y_train, X_valid, y_valid, X_test, y_test, weight_class, dict_mapping = data(
                 standardized=data_type,
                 num_of_classes=num_classes,
-                ns=False)
+                ns=True, create_4d_arr=False)
 
             y_train_cate = to_categorical(y_train, num_classes)
             y_valid_cate = to_categorical(y_valid, num_classes)
@@ -79,16 +80,18 @@ def search():
                             print(f'Current parameters are {current_param}')
 
                             y_pred = model.predict(X_test)
+                            # reverse_mapping = dict((label, index) for index, label in dict_mapping.items())
+                            # real_y = [dict_mapping[y] for y in y_test]
+                            # pred_y = [(dict_mapping[y[0]], y[1]) for y in y_pred]
+                            # real_y = [reverse_mapping[y] for y in y_test]
+                            # pred_y = [(reverse_mapping[y[0]], y[1]) for y in y_pred]
 
-                            real_y = [dict_mapping[y] for y in y_test]
-                            pred_y = [(dict_mapping[y[0]], y[1]) for y in y_pred]
-
-                            true_conf, true_dicti, false_conf, false_dicti = create_dict_conf(real_y,
-                                                                                              pred_y,
+                            y_class_pred = [int(pred[0]) for pred in y_pred]
+                            true_conf, true_dicti, false_conf, false_dicti = create_dict_conf(y_test,
+                                                                                              y_pred,
                                                                                               num_classes)
 
                             test_acc = model.model.evaluate(X_test, y_test_cate, batch_size=64)[1]
-                            y_class_pred = [int(pred[0]) for pred in y_pred]
 
                             plot_confusion_matrix(y_test, y_class_pred,
                                                   np.array(list(dict_mapping.keys())),
