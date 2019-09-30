@@ -9,14 +9,10 @@ import numpy as np
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, CSVLogger
 from keras.metrics import top_k_categorical_accuracy
-from keras.utils import plot_model
 from keras_self_attention import SeqSelfAttention
-# from hyperas import optim
-# from hyperopt import Trials, STATUS_OK, tpe
-# from hyperas.distributions import choice, uniform
 
-from source.learning_rates.others import choose_lr
 from settings import NUM_OF_CLASSES
+from source.learning_rates.get_lr import choose_lr
 from utils.utilites import multiple_generator
 
 

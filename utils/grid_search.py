@@ -8,7 +8,7 @@ from keras.utils import to_categorical
 
 from settings import WEIGHTS_DIR
 from source.data_loader import data
-from source.load_file import get_model
+from source.get_model import get_model
 from source.plotting_predictions import plot_confidence, plot_classes, create_dict_conf, plot_confidence_per_class, \
     plot_confusion_matrix, plot_history
 from utils.utilites import smooth_labels
@@ -18,15 +18,15 @@ def search():
     best_parameters = {}
     acc = 0
     epochs = 10
-    batch_size = 128
-    grid = {'data_type': ['standardized', 'normalized'],  # standardized, normalized is done for OS RNN
-            'num_of_classes': [30],  # num_classes - 10, smooth-factor - 0, normalized
-            'smooth_factor': [0.1],  # 0
+    batch_size = 64
+    grid = {'data_type': ['standardized', 'normalized'],  # TODO: reshape CNN to accept 3D array and train all combos
+            'num_of_classes': [10, 30, 50],  # 50 standardized, ([10, 30, 50], normalized)
+            'smooth_factor': [0, 0.1],  # 0
             'optimizer': ['adam', 'rmsprop'],
             'learning_rate': ['cosine', 'cyclic'],
-            'models': ['CNNLSTM', 'ANN', "GRU", 'BiLSTM', 'LSTM']}
-    # 'models': ['ANN', 'CNN', 'CNNRNN'', 'GRU', 'BiLSTM', 'CNNLSTM']}
-    # Finished models: ANN, LSTM, GRU, BiLSTM, CNN, on training: CNN
+            'models': ['CNN']}
+    # 'models': ['ANN', 'CNN', 'CNNRNN', 'GRU', 'BiLSTM', 'CNNLSTM']}
+    # Finished models: ANN, LSTM, GRU, BiLSTM., on training: CNN. Do CNNRNN and CNNLSTM on NS data
 
     for data_type in grid['data_type']:
         # for class_type in grid['class_types']:
@@ -34,7 +34,8 @@ def search():
             X_train, y_train, X_valid, y_valid, X_test, y_test, weight_class, dict_mapping = data(
                 standardized=data_type,
                 num_of_classes=num_classes,
-                ns=True, create_4d_arr=False)
+                ns=True,
+                create_4d_arr=True)
 
             y_train_cate = to_categorical(y_train, num_classes)
             y_valid_cate = to_categorical(y_valid, num_classes)
@@ -47,7 +48,7 @@ def search():
                     for lr_type in grid['learning_rate']:
                         for model_name in grid['models']:
                             print('Stared new fitting')
-                            save_dir = f'/mnt/hdd/PycharmProjects/pollen_classification/new_weights/os/{data_type}' \
+                            save_dir = f'/mnt/hdd/PycharmProjects/pollen_classification/new_weights/ns/{data_type}' \
                                        f'/smooth_factor_{smooth_factor}' \
                                        f'/optimizer_{optimizer}' \
                                        f'/learning_rate_type_{lr_type}/' \
