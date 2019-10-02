@@ -6,7 +6,7 @@ import glob2
 import numpy as np
 from keras.utils import to_categorical
 
-from settings import WEIGHTS_DIR
+from settings import WEIGHTS_DIR, NS_WEIGHTS_DIR
 from source.data_loader import data
 from source.get_model import get_model
 from source.plotting_predictions import plot_confidence, plot_classes, create_dict_conf, plot_confidence_per_class, \
@@ -19,12 +19,12 @@ def search():
     acc = 0
     epochs = 10
     batch_size = 64
-    grid = {'data_type': ['standardized', 'normalized'],  # TODO: reshape CNN to accept 3D array and train all combos
-            'num_of_classes': [10, 30, 50],  # 50 standardized, ([10, 30, 50], normalized)
-            'smooth_factor': [0, 0.1],  # 0
+    grid = {'data_type': ['standard_normal', 'normalized'],
+            'num_of_classes': [50],  # 30
+            'smooth_factor': [0.1],  #
             'optimizer': ['adam', 'rmsprop'],
             'learning_rate': ['cosine', 'cyclic'],
-            'models': ['CNN']}
+            'models': ['CNNRNN', 'CNNLSTM']}
     # 'models': ['ANN', 'CNN', 'CNNRNN', 'GRU', 'BiLSTM', 'CNNLSTM']}
     # Finished models: ANN, LSTM, GRU, BiLSTM., on training: CNN. Do CNNRNN and CNNLSTM on NS data
 
@@ -35,7 +35,7 @@ def search():
                 standardized=data_type,
                 num_of_classes=num_classes,
                 ns=True,
-                create_4d_arr=True)
+                create_4d_arr=False)
 
             y_train_cate = to_categorical(y_train, num_classes)
             y_valid_cate = to_categorical(y_valid, num_classes)
@@ -110,18 +110,25 @@ def search():
     return best_parameters, acc
 
 
-def find_val_acc():
-    weights_dir = WEIGHTS_DIR
+def find_val_acc(weights_dir, name=None):
     file_paths = glob2.glob(osp.join(weights_dir, '**/*.hdf5'))
 
     val_acc = []
     file_names = []
     for index, file in enumerate(file_paths):
-        split_file = file.split("/")
-        acc = split_file[-1][-10:-5]
-        if file not in file_names:
-            file_names.append(file)
-            val_acc.append(float(acc))
+        if name is not None:
+            if name in file:
+                split_file = file.split("/")
+                acc = split_file[-1][-10:-5]
+                if file not in file_names:
+                    file_names.append(file)
+                    val_acc.append(float(acc))
+        else:
+            split_file = file.split("/")
+            acc = split_file[-1][-10:-5]
+            if file not in file_names:
+                file_names.append(file)
+                val_acc.append(float(acc))
 
     return val_acc, file_names
 
@@ -138,7 +145,7 @@ def fin_top_acc(val_acc, file_names, top_acc):
 
 
 if __name__ == '__main__':
-    best_acc = search()
-    # val_acc, file_names = find_val_acc()
-    # top_val_acc, top_names_acc = fin_top_acc(val_acc, file_names, 100)
-    # print()
+    # best_acc = search()
+    val_acc, file_names = find_val_acc(NS_WEIGHTS_DIR, name='LSTM')
+    top_val_acc, top_names_acc = fin_top_acc(val_acc, file_names, 80)
+    print()

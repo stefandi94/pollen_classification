@@ -45,8 +45,15 @@ NS_STANDARDIZED_VALID_DIR = osp.join(NS_VALID_DIR, 'standardized_data')
 NS_NORMALIZED_TEST_DIR = osp.join(NS_TEST_DIR, 'normalized_data')
 NS_STANDARDIZED_TEST_DIR = osp.join(NS_TEST_DIR, 'standardized_data')
 
-WEIGHTS_DIR = osp.join(BASE_DIR, 'model_weights')
-# MODEL_DIR
+WEIGHTS_DIR = osp.join(BASE_DIR, 'new_weights')
+NS_WEIGHTS_DIR = osp.join(WEIGHTS_DIR, 'ns')
+OS_WEIGHTS_DIR = osp.join(WEIGHTS_DIR, 'os')
+
+NS_NORM_WEIGHTS_DIR = osp.join(NS_WEIGHTS_DIR, 'normalized')
+NS_STAND_WEIGHTS_DIR = osp.join(NS_WEIGHTS_DIR, 'standard_normal')
+
+OS_NORM_WEIGHTS_DIR = osp.join(OS_WEIGHTS_DIR, 'normalized')
+OS_STAND_WEIGHTS_DIR = osp.join(OS_WEIGHTS_DIR, 'standard_normal')
 
 MODEL_DIR = osp.join(BASE_DIR, 'model_weights')
 

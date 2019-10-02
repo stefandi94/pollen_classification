@@ -1,1 +1,1 @@
-from .model import CNNRNN
+from .model import CNN_1_LSTM_2

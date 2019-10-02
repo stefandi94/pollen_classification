@@ -3,7 +3,7 @@ from .ann_cnn import ANNCNN
 from .ann_cnn_rnn import ANNCNNRNN
 from .bilstm import BiLSTM
 from .cnn import CNN
-from .cnn_rnn import CNNRNN
+from .cnn_rnn import CNN_1_LSTM_2
 from .efficient_net import EfficientNet
 from .inception_net import Inception
 from .lstm_net import RNNLSTM

@@ -1,4 +1,4 @@
-from source.models import ANN, CNN, RNNGRU, BiLSTM, RNNLSTM, CNNRNN
+from source.models import ANN, CNN, RNNGRU, BiLSTM, RNNLSTM, CNN_1_LSTM_2
 from source.models.cnn_and_lstm import CNNLSTM
 
 
@@ -14,7 +14,7 @@ def get_model(model_name):
     elif model_name == 'LSTM':
         model = RNNLSTM
     elif model_name == 'CNNRNN':
-        model = CNNRNN
+        model = CNN_1_LSTM_2
     elif model_name == 'CNNLSTM':
         model = CNNLSTM
 

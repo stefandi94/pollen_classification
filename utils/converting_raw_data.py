@@ -3,10 +3,12 @@
 import json
 import os
 import os.path as osp
+import pickle
 
 import numpy as np
 import pandas as pd
 
+from settings import NS_RAW_DATA_DIR, NS_DATA_DIR, OS_DATA_DIR, OS_RAW_DATA_DIR
 from utils.preprocessing import label_to_index, calculate_and_check_shapes
 
 
@@ -20,8 +22,6 @@ def transform_raw_data(raw_data_path):
     for file_name in files:
         if file_name.split(".")[-1] != "json":
             continue
-        # if file_name == 'Agrostis.json':
-        #     break
 
         raw_data = json.loads(open(osp.join(raw_data_path, file_name)).read())
 
@@ -31,11 +31,6 @@ def transform_raw_data(raw_data_path):
             calculate_and_check_shapes(file_data, file_name, specmax, data, labels, class_to_num)
 
     feature_names = ["scatter", "size", "life_1", "spectrum", "life_2"]
-    # files = {"data": data,
-    #          "labels": labels,
-    #          "label_to_index": class_to_num,
-    #          "feature_names": feature_names}
-    # return files
     return data, labels, class_to_num, feature_names
 
 
@@ -65,5 +60,11 @@ def create_lifetime(data, path_to_save):
 
     for i in range(len(lista)):
         amb.loc[len(amb)] = lista[i]
-
     amb.to_csv(osp.join(path_to_save, "Time of lifetime.csv"), index=False)
+
+
+if __name__ == '__main__':
+    data, labels, label_to_index, feature_names = transform_raw_data(OS_RAW_DATA_DIR)
+    print()
+    # with open(osp.join(NS_DATA_DIR, 'label_to_index.pckl'), 'wb') as handle:
+    #     pickle.dump(label_to_index, handle, protocol=pickle.HIGHEST_PROTOCOL)

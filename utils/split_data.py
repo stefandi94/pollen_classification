@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from utils.converting_raw_data import transform_raw_data
-from settings import RANDOM_STATE, OS_RAW_DATA_DIR, OS_DATA_DIR
+from settings import RANDOM_STATE, OS_RAW_DATA_DIR, OS_DATA_DIR, NS_RAW_DATA_DIR, NS_DATA_DIR
 from utils.utilites import count_values
 
 np.random.seed(RANDOM_STATE)
@@ -102,7 +102,10 @@ def split_and_save_data(raw_data_path,
     print(f'Started transforming raw data at {datetime.now().time()}')
     data, labels, label_to_index, feature_names = transform_raw_data(raw_data_path)
 
-    save_data(label_to_index, data_path=output_data_path, filename="label_to_index")
+    with open(osp.join(output_data_path, 'label_to_index.pckl'), 'wb') as handle:
+        pickle.dump(label_to_index, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    # save_data(label_to_index, data_path=output_data_path, filename="label_to_index")
 
     print(f'Started creating train/test data {datetime.now().time()}')
     data_to_save, labels_to_save = create_train_valid_test_data(data=data,
@@ -198,5 +201,5 @@ def create_csv(data):
 
 if __name__ == '__main__':
 
-    # split_and_save_data(NS_RAW_DATA_DIR, NS_DATA_DIR)
-    split_and_save_data(OS_RAW_DATA_DIR, OS_DATA_DIR)
+    split_and_save_data(NS_RAW_DATA_DIR, NS_DATA_DIR)
+    # split_and_save_data(OS_RAW_DATA_DIR, OS_DATA_DIR)

@@ -69,7 +69,7 @@ class BaseDLModel:
               y_train: np.ndarray or List[np.ndarray],
               X_valid: np.ndarray or List[np.ndarray],
               y_valid: np.ndarray or List[np.ndarray],
-              lr_type,
+              lr_type=None,
               weight_class: np.ndarray = None,
               generator: bool = False) -> None:
         """
@@ -107,7 +107,6 @@ class BaseDLModel:
             with redirect_stdout(f):
                 self.model.summary()
         # plot_model(self.model, to_file=osp.join(self.save_dir, 'model.png'), show_shapes=True, show_layer_names=True)
-
         lr = choose_lr(lr_type, X_train, self.batch_size, self.epochs)
 
         checkpoint = ModelCheckpoint(os.path.join(self.save_dir, weights_name),

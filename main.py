@@ -14,14 +14,14 @@ from source.plotting_predictions import plot_confidence, plot_classes, create_di
 from utils.split_data import save_data
 from utils.utilites import smooth_labels
 
-smooth_factor = 0
+smooth_factor = 0.0
 shapes = dict(input_shape_1=(20, 120),
               input_shape_2=(4, 24),
               input_shape_3=(4, 32))
 
 standardized = True
 normalized = False
-NUM_OF_CLASSES = 15
+NUM_OF_CLASSES = 50
 top_classes = True
 
 if standardized:
@@ -33,19 +33,24 @@ elif normalized:
     VALID_DIR = NS_NORMALIZED_VALID_DIR
     TEST_DIR = NS_NORMALIZED_TEST_DIR
 
-parameters = {'epochs': 5,
-              'batch_size': 128,
+# load_dir = '/mnt/hdd/PycharmProjects/pollen_classification/new_weights/ns/normalized/smooth_factor_0.1/optimizer_adam' \
+#            '/learning_rate_type_cosine/model_name_CNNRNN/ '
+load_dir = '/mnt/hdd/PycharmProjects/pollen_classification/new_weights/ns/standard_normal/smooth_factor_0.0/optimizer_rmsprop/learning_rate_type_cosine/model_name_GRU/'
+parameters = {'epochs': 30,
+              'batch_size': 256,
               'optimizer': 'adam',
               'num_classes': NUM_OF_CLASSES,
-              'save_dir': f'./test'}
-              # 'load_dir': f'./model_weights/ns/normalized/ANN/top/smooth_factor_0/adam/lr_cosine/15/10-0.809-0.747-0.741-0.773.hdf5'}
+              'save_dir': f'{os.path.join(load_dir, str(NUM_OF_CLASSES))}',
+              'load_dir': f'{os.path.join(load_dir, "10-1.744-0.515-1.631-0.549.hdf5")}'}
 
 
 if __name__ == '__main__':
 
     X_train, y_train, X_valid, y_valid, X_test, y_test, weight_class, dict_mapping = data(standardized=True,
                                                                                           num_of_classes=NUM_OF_CLASSES,
-                                                                                          top_classes=top_classes)
+                                                                                          top_classes=top_classes,
+                                                                                          ns=True,
+                                                                                          create_4d_arr=False)
 
     y_train_cate = to_categorical(y_train, NUM_OF_CLASSES)
     y_valid_cate = to_categorical(y_valid, NUM_OF_CLASSES)
@@ -54,18 +59,18 @@ if __name__ == '__main__':
     smooth_labels(y_train_cate, smooth_factor)
 
     dnn = ANN(**parameters)
-    dnn.train(X_train,
-              y_train_cate,
-              X_valid,
-              y_valid_cate,
-              weight_class=weight_class,
-              lr_type='cosine')
-
-    # dnn.load_model(parameters["load_dir"])
+    dnn.load_model(parameters["load_dir"])
+    # dnn.train(X_train,
+    #           y_train_cate,
+    #           X_valid,
+    #           y_valid_cate,
+    #           weight_class=weight_class,
+    #           lr_type='cyclic')
+    print()
     import os.path as osp
     os.makedirs('./test', exist_ok=True)
-    with open(osp.join('./test', 'mapping.pckl'), 'wb') as handle:
-        pickle.dump(dict_mapping, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open(osp.join('./test', 'mapping.pckl'), 'wb') as handle:
+    #     pickle.dump(dict_mapping, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     y_pred = dnn.predict(X_test)
     eval = dnn.model.evaluate(X_test, y_test_cate, batch_size=64)
@@ -80,8 +85,8 @@ if __name__ == '__main__':
     true_conf, true_dicti, false_conf, false_dicti = create_dict_conf(y_test, y_pred, NUM_OF_CLASSES)
 
     # plot_confusion_matrix(y_test, y_class_pred, list(dict_mapping.keys()), './test')
-    plot_confusion_matrix(y_test, y_class_pred, list(dict_mapping.keys()), './test', normalize=True)
-    plot_confidence(true_conf, false_conf, './test', show_plot=False)
-    plot_classes(y_test, y_pred, './test', NUM_OF_CLASSES, show_plot=False)
-    plot_confidence_per_class(true_dicti, false_dicti, NUM_OF_CLASSES, './test', show_plot=False)
-    plot_history(log_path='./test')
+    # plot_confusion_matrix(y_test, y_class_pred, list(dict_mapping.keys()), parameters['save_dir'], normalize=True)
+    plot_confidence(true_conf, false_conf, parameters['save_dir'], show_plot=False)
+    plot_classes(y_test, y_pred, parameters['save_dir'], NUM_OF_CLASSES, show_plot=False)
+    plot_confidence_per_class(true_dicti, false_dicti, NUM_OF_CLASSES, parameters['save_dir'], show_plot=False)
+    plot_history(log_path=parameters['save_dir'])

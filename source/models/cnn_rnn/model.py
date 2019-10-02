@@ -7,7 +7,7 @@ from source.base_dl_model import BaseDLModel
 from source.models.convolutional_layers.cnn_layers import create_cnn_network
 
 
-class CNNRNN(BaseDLModel):
+class CNN_1_LSTM_2(BaseDLModel):
     rnn_shapes = [(20, 120)]
     cnn_shapes = [(4, 32), (4, 24)]
     convolution_filters = [64, 128, 256]
