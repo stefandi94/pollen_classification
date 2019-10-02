@@ -15,17 +15,18 @@ np.random.seed(RANDOM_STATE)
 
 
 def load_data(data_path, filename):
-    # with open(osp.join(data_path, f'{filename}.pckl'), 'rb') as handle:
-    #     data = pickle.load(handle)
-    data = np.load(osp.join(data_path, f'{filename}.npy'))
+    with open(osp.join(data_path, f'{filename}.pckl'), 'rb') as handle:
+        data = pickle.load(handle)
+    # data = np.load(osp.join(data_path, f'{filename}.npy'))
     return data
 
 
 def save_data(file, data_path, filename):
-    os.makedirs(data_path, exist_ok=True)
-    np.save(file, osp.join(data_path, f'{filename}.npy'))
-    # with open(osp.join(data_path, f'{filename}.pckl'), 'wb') as handle:
-    #     pickle.dump(file, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    # os.makedirs(data_path, exist_ok=True)
+    # np.save(file, osp.join(data_path, f'{filename}.npy'))
+    with open(osp.join(data_path, f'{filename}.pckl'), 'wb') as handle:
+        pickle.dump(file, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def create_train_valid_test_data(data: dict,
@@ -81,14 +82,14 @@ def find_statistical_components(data):
     return {'min': min_value, 'max': max_value, 'mean': mean_value, 'std': std_value}
 
 
-def normalize_data(data, mean_value, std_value):
+def convert_data_to_standard_normal(data, mean_value, std_value):
     data -= mean_value
     data /= std_value
 
     return data
 
 
-def standardize_data(data, min_value, max_value):
+def convert_data_to_normal_0_1(data, min_value, max_value):
     data -= min_value
     data /= max_value - min_value
 
@@ -136,9 +137,15 @@ def split_and_save_data(raw_data_path,
                 if not osp.exists(standardized_path):
                     os.makedirs(standardized_path)
 
-                save_data(file=standardize_data(data_to_save[dir_index][feature_index],
-                                                stat_comp["min"],
-                                                stat_comp["max"]),
+                # with open(osp.join(standardized_path, f'{feature}.pckl'), 'wb') as handle:
+                #     file = convert_data_to_standard(data_to_save[dir_index][feature_index],
+                #                                     stat_comp["min"],
+                #                                     stat_comp["max"])
+                #     pickle.dump(file, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+                save_data(file=convert_data_to_normal_0_1(data_to_save[dir_index][feature_index],
+                                                          stat_comp["min"],
+                                                          stat_comp["max"]),
                           data_path=standardized_path,
                           filename=feature)
 
@@ -147,9 +154,15 @@ def split_and_save_data(raw_data_path,
                 if not osp.exists(normalize_path):
                     os.makedirs(normalize_path)
 
-                save_data(file=normalize_data(data_to_save[dir_index][feature_index],
-                                              stat_comp["min"],
-                                              stat_comp["max"]),
+                # with open(osp.join(normalize_path, f'{feature}.pckl'), 'wb') as handle:
+                #     file = convert_data_to_standard_normal(data_to_save[dir_index][feature_index],
+                #                                            stat_comp["mean_value"],
+                #                                            stat_comp["std_value"])
+                #     pickle.dump(file, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                #
+                save_data(file=convert_data_to_standard_normal(data_to_save[dir_index][feature_index],
+                                                               stat_comp["mean"],
+                                                               stat_comp["std"]),
                           data_path=normalize_path,
                           filename=feature)
 

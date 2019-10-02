@@ -5,7 +5,7 @@ from settings import NS_STANDARDIZED_TRAIN_DIR, NS_NORMALIZED_VALID_DIR, NS_NORM
     OS_NORMALIZED_VALID_DIR, OS_NORMALIZED_TRAIN_DIR, OS_STANDARDIZED_TEST_DIR, OS_STANDARDIZED_VALID_DIR, \
     OS_STANDARDIZED_TRAIN_DIR
 from source.data_reader import load_all_data, create_3d_array, create_4d_array
-from utils.split_data import cut_classes, label_mappings
+from utils.split_data import cut_classes, label_mappings, save_data
 from utils.utilites import calculate_weights
 
 
@@ -75,11 +75,13 @@ def data(standardized, num_of_classes, top_classes=True, ns=True, create_4d_arr=
     # dict_mapping = dict((index, index) for index in np.unique(y_train))
     # else:
     dict_mapping = label_mappings(classes_to_take)
+    save_data(dict_mapping, TRAIN_DIR, f'dict_mapping_{num_of_classes}')
 
     y_train = [dict_mapping[label] for label in y_train]
     y_valid = [dict_mapping[label] for label in y_valid]
     y_test = [dict_mapping[label] for label in y_test]
 
     weight_class = calculate_weights(y_train)
+    save_data(dict_mapping, TRAIN_DIR, f'weight_class_{num_of_classes}')
 
     return X_train, y_train, X_valid, y_valid, X_test, y_test, weight_class, dict_mapping

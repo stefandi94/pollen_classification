@@ -58,6 +58,9 @@ def search():
                             with open(osp.join(save_dir, 'mapping.pckl'), 'wb') as handle:
                                 pickle.dump(dict_mapping, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+                            with open(osp.join(save_dir, 'weight_class.pckl'), 'wb') as handle:
+                                pickle.dump(dict_mapping, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
                             model = (get_model(model_name))(optimizer=optimizer,
                                                             batch_size=batch_size,
                                                             num_classes=num_classes,

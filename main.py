@@ -1,92 +1,88 @@
 import os
 import pickle
 
-from keras.utils import to_categorical
-from sklearn.metrics import confusion_matrix
+from utils.utilites import count_values
+
 import numpy as np
+from keras.utils import to_categorical
 
-from source.data_loader import data
-from settings import NS_STANDARDIZED_VALID_DIR, NS_STANDARDIZED_TRAIN_DIR, \
-    NS_STANDARDIZED_TEST_DIR, NS_NORMALIZED_TRAIN_DIR, NS_NORMALIZED_VALID_DIR, NS_NORMALIZED_TEST_DIR
-from source.models import BiLSTM, ANN
-from source.plotting_predictions import plot_confidence, plot_classes, create_dict_conf, plot_confidence_per_class, \
-    plot_confusion_matrix, plot_history
-from utils.split_data import save_data
-from utils.utilites import smooth_labels
+from settings import OS_TRAIN_DIR, NS_TRAIN_DIR, NS_DATA_DIR, OS_DATA_DIR
+from source.get_model import get_model
+from source.models import ANN
+from utils.converting_raw_data import transform_raw_data
+from utils.split_data import load_data, convert_data_to_normal_0_1, convert_data_to_standard_normal
 
-smooth_factor = 0.0
-shapes = dict(input_shape_1=(20, 120),
-              input_shape_2=(4, 24),
-              input_shape_3=(4, 32))
+data_path = './'
+data, labels, class_to_num, feature_names = transform_raw_data('/mnt/hdd/PycharmProjects/pollen_classification/data/raw/OS/')
+model_name = 'ANN'
+NUM_OF_CLASSES = 8
+normalize = True
+NS = False
 
-standardized = True
-normalized = False
-NUM_OF_CLASSES = 50
-top_classes = True
+load_dir = '/mnt/hdd/PycharmProjects/pollen_classification/new_weights/os/standard_normal/smooth_factor_0.0/'\
+           'optimizer_adam/learning_rate_type_cosine/model_name_ANN/8/25-0.872-0.713-0.949-0.694.hdf5'
 
-if standardized:
-    TRAIN_DIR = NS_STANDARDIZED_TRAIN_DIR
-    VALID_DIR = NS_STANDARDIZED_VALID_DIR
-    TEST_DIR = NS_STANDARDIZED_TEST_DIR
-elif normalized:
-    TRAIN_DIR = NS_NORMALIZED_TRAIN_DIR
-    VALID_DIR = NS_NORMALIZED_VALID_DIR
-    TEST_DIR = NS_NORMALIZED_TEST_DIR
+# ova ima 10 clase
+# load_dir = '/mnt/hdd/PycharmProjects/pollen_classification/new_weights/os/standardized/smooth_factor_0.0/' \
+#            'optimizer_rmsprop/learning_rate_type_cyclic/model_name_GRU/5-1.100-0.606-0.808-0.717.hdf5'
 
-# load_dir = '/mnt/hdd/PycharmProjects/pollen_classification/new_weights/ns/normalized/smooth_factor_0.1/optimizer_adam' \
-#            '/learning_rate_type_cosine/model_name_CNNRNN/ '
-load_dir = '/mnt/hdd/PycharmProjects/pollen_classification/new_weights/ns/standard_normal/smooth_factor_0.0/optimizer_rmsprop/learning_rate_type_cosine/model_name_GRU/'
 parameters = {'epochs': 30,
               'batch_size': 256,
               'optimizer': 'adam',
               'num_classes': NUM_OF_CLASSES,
-              'save_dir': f'{os.path.join(load_dir, str(NUM_OF_CLASSES))}',
-              'load_dir': f'{os.path.join(load_dir, "10-1.744-0.515-1.631-0.549.hdf5")}'}
+              'save_dir': f'./save_dir',
+              'load_dir': f'{load_dir}'}
 
+if NS:
+    # load statistical components
+    life_1_stat_comp = load_data(NS_TRAIN_DIR, 'life_1_stat_comp')
+    scatter_stat_comp = load_data(NS_TRAIN_DIR, 'scatter_stat_comp')
+    spectrum_stat_comp = load_data(NS_TRAIN_DIR, 'size_stat_comp')
 
-if __name__ == '__main__':
+    with open(os.path.join(NS_TRAIN_DIR, 'normalized_data', f'dict_mapping_{NUM_OF_CLASSES}.pckl'), 'rb') as handle:
+        dict_mapping = pickle.load(handle)
 
-    X_train, y_train, X_valid, y_valid, X_test, y_test, weight_class, dict_mapping = data(standardized=True,
-                                                                                          num_of_classes=NUM_OF_CLASSES,
-                                                                                          top_classes=top_classes,
-                                                                                          ns=True,
-                                                                                          create_4d_arr=False)
+    with open(os.path.join(NS_DATA_DIR, 'label_to_index.pckl'), 'rb') as handle:
+        labels_pickle_mapping = pickle.load(handle)
 
-    y_train_cate = to_categorical(y_train, NUM_OF_CLASSES)
-    y_valid_cate = to_categorical(y_valid, NUM_OF_CLASSES)
-    y_test_cate = to_categorical(y_test, NUM_OF_CLASSES)
+else:
+    life_1_stat_comp = load_data(OS_TRAIN_DIR, 'life_1_stat_comp')
+    scatter_stat_comp = load_data(OS_TRAIN_DIR, 'scatter_stat_comp')
+    spectrum_stat_comp = load_data(OS_TRAIN_DIR, 'size_stat_comp')
 
-    smooth_labels(y_train_cate, smooth_factor)
+    with open(os.path.join(OS_TRAIN_DIR, 'normalized_data', f'dict_mapping_{NUM_OF_CLASSES}.pckl'), 'rb') as handle:
+        dict_mapping = pickle.load(handle)
 
-    dnn = ANN(**parameters)
-    dnn.load_model(parameters["load_dir"])
-    # dnn.train(X_train,
-    #           y_train_cate,
-    #           X_valid,
-    #           y_valid_cate,
-    #           weight_class=weight_class,
-    #           lr_type='cyclic')
-    print()
-    import os.path as osp
-    os.makedirs('./test', exist_ok=True)
-    # with open(osp.join('./test', 'mapping.pckl'), 'wb') as handle:
-    #     pickle.dump(dict_mapping, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    with open(os.path.join(OS_DATA_DIR, 'label_to_index.pckl'), 'rb') as handle:
+        labels_pickle_mapping = pickle.load(handle)
 
-    y_pred = dnn.predict(X_test)
-    eval = dnn.model.evaluate(X_test, y_test_cate, batch_size=64)
-    # TODO: napraviti dict mapping za 15 i 35 klasa, posto nisu sacuvani?
+print()
 
-    # real_y = [dict_mapping[y] for y in y_test]
-    # pred_y = [(dict_mapping[y[0]], y[1]) for y in y_pred]
+new_data = [[], [], []]
+stat_components = [scatter_stat_comp, life_1_stat_comp, spectrum_stat_comp]
+for index, feature in enumerate(['scatter', 'life_1', 'spectrum']):
+    if normalize:
+        new_data[index] = convert_data_to_standard_normal(data[feature],
+                                                          stat_components[index]['mean'],
+                                                          stat_components[index]['std'])
+    else:
+        new_data[index] = convert_data_to_normal_0_1(data[feature],
+                                                     stat_components[index]['min'],
+                                                     stat_components[index]['max'])
 
-    print(f'Accuracy is {eval[1]}')
-    y_class_pred = [int(pred[0]) for pred in y_pred]
-    conf_matrix = confusion_matrix(y_test, y_class_pred)
-    true_conf, true_dicti, false_conf, false_dicti = create_dict_conf(y_test, y_pred, NUM_OF_CLASSES)
+# convert to same labels as model was trained
+# num_to_class = dict((label, clas) for (clas, label) in labels_pickle_mapping.items())
 
-    # plot_confusion_matrix(y_test, y_class_pred, list(dict_mapping.keys()), './test')
-    # plot_confusion_matrix(y_test, y_class_pred, list(dict_mapping.keys()), parameters['save_dir'], normalize=True)
-    plot_confidence(true_conf, false_conf, parameters['save_dir'], show_plot=False)
-    plot_classes(y_test, y_pred, parameters['save_dir'], NUM_OF_CLASSES, show_plot=False)
-    plot_confidence_per_class(true_dicti, false_dicti, NUM_OF_CLASSES, parameters['save_dir'], show_plot=False)
-    plot_history(log_path=parameters['save_dir'])
+# label_class = [class_to_num[label] for label in ]
+new_labels = [dict_mapping[label] for label in labels]
+
+# new_labels = [labels_pickle_mapping[label] for label in new_labels]
+cate_label = to_categorical(new_labels, num_classes=NUM_OF_CLASSES)
+
+dl_model = ANN()
+dl_model.load_model(parameters['load_dir'])
+
+# y_pred = dl_model.predict(data)
+test_acc = dl_model.model.evaluate(new_data, cate_label, batch_size=256)
+
+print(f'Accuracy is: {test_acc[1]}')

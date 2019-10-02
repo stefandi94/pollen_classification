@@ -58,21 +58,10 @@ OS_STAND_WEIGHTS_DIR = osp.join(OS_WEIGHTS_DIR, 'standard_normal')
 MODEL_DIR = osp.join(BASE_DIR, 'model_weights')
 
 ########################################################################################################################
-
+LIFE_STAT_COMP = osp.join(NS_TRAIN_DIR, '/mnt/hdd/PycharmProjects/pollen_classification/data/extracted/NS/train/')
+SCATTER_STAT_COMP = osp.join('/mnt/hdd/PycharmProjects/pollen_classification/data/extracted/NS/train/')
+SIZE_STAT_COMP = osp.join('/mnt/hdd/PycharmProjects/pollen_classification/data/extracted/NS/train/')
 # MODEL FOLDERS
-
-# RESIDUAL_DIR
-RESIDUAL_DIR = osp.join(MODEL_DIR, 'residual_net')
-RESIDUAL_18 = osp.join(RESIDUAL_DIR, 'resnet_18')
-
-# WIDE RESIDUALS
-WIDE_RESIDUAL_DIR = osp.join(MODEL_DIR, 'wide_residuals')
-
-# VGG DIR
-VGG_DIR = osp.join(MODEL_DIR, 'vgg_net')
-
-# INCEPTION DIR
-INCEPTION_DIR = osp.join(MODEL_DIR, 'inception_net')
 
 KERNEL_REGULARIZER = 0.0000
 ACTIVITY_REGULARIZER = 0.0000
